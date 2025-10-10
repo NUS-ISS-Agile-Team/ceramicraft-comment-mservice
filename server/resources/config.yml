@@ -17,3 +17,8 @@ mysql:
   port: "3306"
   userName: "root"
   dbName: "comment_db"
+
+mongo:
+  host: "mongo-container"
+  port: "27017"
+  database: "comment_db"

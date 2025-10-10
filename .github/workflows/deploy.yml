@@ -74,7 +74,7 @@ jobs:
         run: |
           docker stop ceramicraft-comment-mservice || true
           docker rm ceramicraft-comment-mservice || true
-          docker run -d --name ceramicraft-comment-mservice --network ceramicraft-network --env-file env-file "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
+          docker run -d --name ceramicraft-comment-mservice --network ceramicraft-network --env-file env-file -v /home/ubuntu/logs:/app/logs "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
   restart:
     if: ${{ github.event.inputs.command == 'restart' }}
     runs-on: self-hosted
@@ -101,4 +101,4 @@ jobs:
         run: |
           docker stop ceramicraft-comment-mservice || true
           docker rm ceramicraft-comment-mservice || true
-          docker run -d --name ceramicraft-comment-mservice --network ceramicraft-network --env-file env-file "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
+          docker run -d --name ceramicraft-comment-mservice --network ceramicraft-network --env-file env-file -v /home/ubuntu/logs:/app/logs "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"

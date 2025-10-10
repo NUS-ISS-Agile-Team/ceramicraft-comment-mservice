@@ -10,6 +10,7 @@ import (
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/http"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/dao/mongo"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
 )
 
@@ -21,6 +22,7 @@ func main() {
 	config.Init()
 	log.InitLogger()
 	repository.Init()
+	mongo.Init()
 	utils.InitJwtSecret()
 	go grpc.Init(sigCh)
 	go http.Init(sigCh)
