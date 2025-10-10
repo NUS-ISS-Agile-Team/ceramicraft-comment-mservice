@@ -49,10 +49,10 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: build docker image
         run: |
-          docker build -t "${DOCKER_HUB_USERNAME}/ceramicraft-mservice-template:${{ github.event.inputs.version }}" server/
+          docker build -t "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}" server/
       - name: push to dockerhub
         run: |
-          docker push "${DOCKER_HUB_USERNAME}/ceramicraft-mservice-template:${{ github.event.inputs.version }}"
+          docker push "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
   deploy:
     if: ${{ github.event.inputs.command == 'deploy' }}
     needs: 
@@ -69,19 +69,19 @@ jobs:
           path: .
       - name: pull the docker image
         run: |
-          docker pull "${DOCKER_HUB_USERNAME}/ceramicraft-mservice-template:${{ github.event.inputs.version }}"
+          docker pull "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
       - name: run docker container
         run: |
-          docker stop ceramicraft-mservice-template || true
-          docker rm ceramicraft-mservice-template || true
-          docker run -d --name ceramicraft-mservice-template --network ceramicraft-network --env-file env-file "${DOCKER_HUB_USERNAME}/ceramicraft-mservice-template:${{ github.event.inputs.version }}"
+          docker stop ceramicraft-comment-mservice || true
+          docker rm ceramicraft-comment-mservice || true
+          docker run -d --name ceramicraft-comment-mservice --network ceramicraft-network --env-file env-file "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
   restart:
     if: ${{ github.event.inputs.command == 'restart' }}
     runs-on: self-hosted
     steps:
       - name: restart docker container
         run: |
-          docker restart ceramicraft-mservice-template || true
+          docker restart ceramicraft-comment-mservice || true
   rollback:
     if: ${{ github.event.inputs.command == 'rollback' }}
     runs-on: self-hosted
@@ -96,9 +96,9 @@ jobs:
           path: .
       - name: pull the docker image
         run: |
-          docker pull "${DOCKER_HUB_USERNAME}/ceramicraft-mservice-template:${{ github.event.inputs.version }}"
+          docker pull "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"
       - name: run docker container
         run: |
-          docker stop ceramicraft-mservice-template || true
-          docker rm ceramicraft-mservice-template || true
-          docker run -d --name ceramicraft-mservice-template --network ceramicraft-network --env-file env-file "${DOCKER_HUB_USERNAME}/ceramicraft-mservice-template:${{ github.event.inputs.version }}"
+          docker stop ceramicraft-comment-mservice || true
+          docker rm ceramicraft-comment-mservice || true
+          docker run -d --name ceramicraft-comment-mservice --network ceramicraft-network --env-file env-file "${DOCKER_HUB_USERNAME}/ceramicraft-comment-mservice:${{ github.event.inputs.version }}"

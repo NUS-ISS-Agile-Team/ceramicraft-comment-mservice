@@ -1,9 +1,9 @@
-module github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/client
+module github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/client
 
 go 1.24.0
 
 require (
-	github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/common v0.0.0-20250928082159-4283b8149a75
+	github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/common v0.0.0-20251010123249-d77fc73795e5
 	google.golang.org/grpc v1.75.1
 )
 

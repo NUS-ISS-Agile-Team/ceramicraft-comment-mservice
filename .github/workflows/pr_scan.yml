@@ -29,7 +29,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-              -Dsonar.projectKey=NUS-ISS-Agile-Team_ceramicraft-mservice-template
+              -Dsonar.projectKey=NUS-ISS-Agile-Team_ceramicraft-comment-mservice
               -Dsonar.sources=server/service
               -Dsonar.go.coverage.reportPaths=server/coverage.out
       - name: SonarCloud Quality Gate check

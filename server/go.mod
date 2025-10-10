@@ -1,9 +1,9 @@
-module github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server
+module github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server
 
 go 1.24.0
 
 require (
-	github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/common v0.0.0-20250928082159-4283b8149a75
+	github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/common v0.0.0-20251010123249-d77fc73795e5
 	github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common v0.0.0-20251001134041-eace300430f3
 	github.com/gin-gonic/gin v1.11.0
 	github.com/spf13/viper v1.21.0

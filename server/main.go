@@ -5,11 +5,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/grpc"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/http"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/repository"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/config"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/grpc"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/http"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
 )
 

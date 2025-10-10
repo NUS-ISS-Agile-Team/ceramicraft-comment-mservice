@@ -10,10 +10,10 @@ http:
 
 log:
   level: debug
-  file_path: ./logs/ceramicraft-mservice-template.log
+  file_path: ./logs/ceramicraft-comment-mservice.log
 
 mysql:
   host: "mysql-container"
   port: "3306"
   userName: "root"
-  dbName: "template_db"
+  dbName: "comment_db"

@@ -4,7 +4,7 @@ services:
     container_name: mysql-container
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: template_db
+      MYSQL_DATABASE: comment_db
     # Pure memory, disappears when CI ends
     tmpfs: /var/lib/mysql
     networks:
@@ -12,11 +12,11 @@ services:
         aliases:
           - mysql-container   # 别名，Go 通过这个名字连接 MySQL
 
-  ceramicraft-mservice-template:
+  ceramicraft-comment-mservice:
     build:
       context: ../../server
       dockerfile: Dockerfile
-    container_name: ceramicraft-mservice-template
+    container_name: ceramicraft-comment-mservice
     environment:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
@@ -26,12 +26,12 @@ services:
       - ci-net
     ports:
       - "8080:8080"   # 只给宿主机（ZAP）用
-    command: ["sh", "-c", "apt-get update && apt-get install -y netcat-openbsd && chmod +x /app/wait-for.sh && ./wait-for.sh mysql-container 3306 ./main"]
+    command: ["sh", "-c", "apk add --no-cache netcat-openbsd && chmod +x /app/wait-for.sh && ./wait-for.sh mysql-container 3306 ./main"]
     volumes:
       - ./wait-for.sh:/app/wait-for.sh   # CI 专用配置
     user: root
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/template-ms/v1/ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/comment-ms/v1/ping"]
       interval: 10s
       timeout: 5s
       retries: 3
