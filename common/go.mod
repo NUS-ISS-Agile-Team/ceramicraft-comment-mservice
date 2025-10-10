@@ -1,4 +1,4 @@
-module github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/common
+module github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/common
 
 go 1.24.0
 
