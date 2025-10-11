@@ -1,5 +1,5 @@
-github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/common v0.0.0-20250928082159-4283b8149a75 h1:Q+UxVwjyZOwsY80POUkRD0Oo5YfYnwQi80zub4EY58c=
-github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/common v0.0.0-20250928082159-4283b8149a75/go.mod h1:YeSX+xFnzyEChunFBniBCUV7nMKepnp2gHXFOkqor+8=
+github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/common v0.0.0-20251010123249-d77fc73795e5 h1:ye/0H+gOldue5ntew6wOkZmCR5C+ruW7zYnQjt2kQgI=
+github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/common v0.0.0-20251010123249-d77fc73795e5/go.mod h1:/WGidwxvxcQfA/zm+h7V+M+D42fEKwcA6D/+MBPRoSc=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=

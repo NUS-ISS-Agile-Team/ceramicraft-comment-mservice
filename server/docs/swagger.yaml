@@ -19,7 +19,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /template-ms/v1/{client}/items:
+  /comment-ms/v1/{client}/items:
     post:
       consumes:
       - application/json
@@ -72,7 +72,7 @@ paths:
       summary: Item Create
       tags:
       - Item
-  /template-ms/v1/{client}/items/{item_id}:
+  /comment-ms/v1/{client}/items/{item_id}:
     get:
       description: Get item information by item ID.
       parameters:

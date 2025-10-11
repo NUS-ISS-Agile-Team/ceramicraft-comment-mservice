@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/http/data"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/service"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/http/data"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +21,7 @@ import (
 // @Success 200	{object} data.BaseResponse{data=data.ItemVO}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /template-ms/v1/{client}/items [post]
+// @Router /comment-ms/v1/{client}/items [post]
 func CreateItem(c *gin.Context) {
 	item := &data.ItemVO{}
 	if err := c.ShouldBindJSON(&item); err != nil {
@@ -44,7 +44,7 @@ func CreateItem(c *gin.Context) {
 // @Param client path string true "Client identifier" Enums(customer, merchant)
 // @Param item_id path int true "Item.ID"
 // @Success 200
-// @Router /template-ms/v1/{client}/items/{item_id} [get]
+// @Router /comment-ms/v1/{client}/items/{item_id} [get]
 func GetItems(c *gin.Context) {
 	itemId := c.Param("item_id")
 	itemIdInt, err := strconv.Atoi(itemId)

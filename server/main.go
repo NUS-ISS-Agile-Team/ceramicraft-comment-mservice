@@ -5,11 +5,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/grpc"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/http"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/repository"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/config"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/grpc"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/http"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/dao/mongo"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
 )
 
@@ -21,6 +22,7 @@ func main() {
 	config.Init()
 	log.InitLogger()
 	repository.Init()
+	mongo.Init()
 	utils.InitJwtSecret()
 	go grpc.Init(sigCh)
 	go http.Init(sigCh)

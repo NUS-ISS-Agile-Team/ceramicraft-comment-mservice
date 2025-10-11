@@ -3,15 +3,15 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
-	_ "github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/docs"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-mservice-template/server/http/api"
+	_ "github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/docs"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/http/api"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	gs "github.com/swaggo/gin-swagger"
 )
 
 const (
-	serviceURIPrefix = "/template-ms/v1"
+	serviceURIPrefix = "/comment-ms/v1"
 )
 
 func NewRouter() *gin.Engine {
@@ -21,7 +21,7 @@ func NewRouter() *gin.Engine {
 	{
 		basicGroup.GET("/swagger/*any", gs.WrapHandler(
 			swaggerFiles.Handler,
-			gs.URL("/template-ms/v1/swagger/doc.json"),
+			gs.URL("/comment-ms/v1/swagger/doc.json"),
 		))
 		basicGroup.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, gin.H{

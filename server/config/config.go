@@ -11,10 +11,17 @@ var (
 )
 
 type Conf struct {
-	GrpcConfig  *GrpcConfig `mapstructure:"grpc"`
-	LogConfig   *LogConfig  `mapstructure:"log"`
-	HttpConfig  *HttpConfig `mapstructure:"http"`
-	MySQLConfig *MySQL      `mapstructure:"mysql"`
+	GrpcConfig  *GrpcConfig    `mapstructure:"grpc"`
+	LogConfig   *LogConfig     `mapstructure:"log"`
+	HttpConfig  *HttpConfig    `mapstructure:"http"`
+	MySQLConfig *MySQL         `mapstructure:"mysql"`
+	MongoConfig *MongoDBConfig `mapstructure:"mongo"`
+}
+
+type MongoDBConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Database string `mapstructure:"database"`
 }
 
 type HttpConfig struct {
