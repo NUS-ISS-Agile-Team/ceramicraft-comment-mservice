@@ -1,11 +1,14 @@
-package mongo
+package dao
 
 import (
 	"context"
 	"sync"
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
+	myMongo "github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/dao/mongo"
+	myRedis "github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/dao/redis"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/model"
+	"github.com/redis/go-redis/v9"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,6 +18,8 @@ import (
 type CommentDao interface {
 	Save(ctx context.Context, comment *model.Comment) error
 	Get(ctx context.Context, id string) (*model.Comment, error)
+	HIncr(ctx context.Context, key string, member string, deta int) (err error)
+	SAdd(ctx context.Context, key string, member string) (err error)
 }
 
 var (
@@ -25,14 +30,16 @@ var (
 func GetCommentDao() CommentDao {
 	commentSyncOnce.Do(func() {
 		commentDaoInstance = &CommentDaoImpl{
-			collection: commentCollection,
+			collection: myMongo.CommentCollection,
+			redisClient: myRedis.RedisClient,
 		}
 	})
 	return commentDaoInstance
 }
 
 type CommentDaoImpl struct {
-	collection *mongo.Collection
+	collection  *mongo.Collection
+	redisClient *redis.Client
 }
 
 // Get implements CommentDao.
@@ -67,4 +74,32 @@ func (c *CommentDaoImpl) Save(ctx context.Context, comment *model.Comment) error
 	}
 	log.Logger.Infof("comment saved with id: %v", ret.InsertedID)
 	return nil
+}
+
+
+func (c *CommentDaoImpl) HIncr(ctx context.Context, key string, member string, deta int) (err error) {
+    if c.redisClient == nil {
+        log.Logger.Errorf("redis client is nil")
+        return nil
+    }
+    cmd := c.redisClient.HIncrBy(ctx, key, member, int64(deta))
+    if cmd.Err() != nil {
+        log.Logger.Errorf("HIncr failed\tkey=%s\tmember=%s\tdeta=%d\terr=%v", key, member, deta, cmd.Err())
+        return cmd.Err()
+    }
+    return nil
+}
+    
+
+func (c *CommentDaoImpl) SAdd(ctx context.Context, key string, member string) (err error) {
+    if c.redisClient == nil {
+        log.Logger.Errorf("redis client is nil")
+        return nil
+    }
+    cmd := c.redisClient.SAdd(ctx, key, member)
+    if cmd.Err() != nil {
+        log.Logger.Errorf("SAdd failed\tkey=%s\tmember=%s\terr=%v", key, member, cmd.Err())
+        return cmd.Err()
+    }
+    return nil
 }

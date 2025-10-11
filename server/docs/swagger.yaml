@@ -7,30 +7,43 @@ definitions:
       err_msg:
         type: string
     type: object
-  data.ItemVO:
+  types.CreateReviewRequest:
     properties:
-      id:
-        type: integer
-      name:
+      content:
         type: string
-    required:
-    - name
+      is_anonymous:
+        type: boolean
+      parentID:
+        type: integer
+      pic_info:
+        items:
+          type: string
+        type: array
+      productID:
+        type: integer
+      stars:
+        type: integer
+    type: object
+  types.LikeRequest:
+    properties:
+      review_id:
+        type: integer
     type: object
 info:
   contact: {}
 paths:
-  /comment-ms/v1/{client}/items:
+  /comment-ms/v1/customer/create:
     post:
       consumes:
       - application/json
-      description: Create an item record.
+      description: Create an review record.
       parameters:
-      - description: Item information
+      - description: CreateReviewRequest
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/data.ItemVO'
+          $ref: '#/definitions/types.CreateReviewRequest'
       - description: Client identifier
         enum:
         - customer
@@ -49,7 +62,7 @@ paths:
             - $ref: '#/definitions/data.BaseResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/data.ItemVO'
+                  $ref: '#/definitions/types.CreateReviewRequest'
               type: object
         "400":
           description: Bad Request
@@ -69,13 +82,21 @@ paths:
                 data:
                   type: string
               type: object
-      summary: Item Create
+      summary: Review Create
       tags:
-      - Item
-  /comment-ms/v1/{client}/items/{item_id}:
-    get:
-      description: Get item information by item ID.
+      - Review
+  /comment-ms/v1/customer/like:
+    post:
+      consumes:
+      - application/json
+      description: Like a review by id
       parameters:
+      - description: LikeRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.LikeRequest'
       - description: Client identifier
         enum:
         - customer
@@ -84,15 +105,37 @@ paths:
         name: client
         required: true
         type: string
-      - description: Item.ID
-        in: path
-        name: item_id
-        required: true
-        type: integer
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-      summary: Item Query with ID
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Like a review
       tags:
-      - Item
+      - Review
 swagger: "2.0"

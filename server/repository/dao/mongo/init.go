@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	commentCollection *mongo.Collection
+	CommentCollection *mongo.Collection
 )
 
 func Init() {
@@ -21,5 +21,5 @@ func Init() {
 		panic(err)
 	}
 	database := client.Database(config.Config.MongoConfig.Database)
-	commentCollection = database.Collection("comments")
+	CommentCollection = database.Collection("comments")
 }

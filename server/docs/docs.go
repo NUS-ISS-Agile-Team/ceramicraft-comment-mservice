@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/comment-ms/v1/{client}/items": {
+        "/comment-ms/v1/customer/create": {
             "post": {
-                "description": "Create an item record.",
+                "description": "Create an review record.",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +25,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Item"
+                    "Review"
                 ],
-                "summary": "Item Create",
+                "summary": "Review Create",
                 "parameters": [
                     {
-                        "description": "Item information",
+                        "description": "CreateReviewRequest",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/data.ItemVO"
+                            "$ref": "#/definitions/types.CreateReviewRequest"
                         }
                     },
                     {
@@ -62,7 +62,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/data.ItemVO"
+                                            "$ref": "#/definitions/types.CreateReviewRequest"
                                         }
                                     }
                                 }
@@ -108,14 +108,29 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment-ms/v1/{client}/items/{item_id}": {
-            "get": {
-                "description": "Get item information by item ID.",
-                "tags": [
-                    "Item"
+        "/comment-ms/v1/customer/like": {
+            "post": {
+                "description": "Like a review by id",
+                "consumes": [
+                    "application/json"
                 ],
-                "summary": "Item Query with ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Like a review",
                 "parameters": [
+                    {
+                        "description": "LikeRequest",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.LikeRequest"
+                        }
+                    },
                     {
                         "enum": [
                             "customer",
@@ -126,18 +141,62 @@ const docTemplate = `{
                         "name": "client",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Item.ID",
-                        "name": "item_id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 }
             }
@@ -156,17 +215,37 @@ const docTemplate = `{
                 }
             }
         },
-        "data.ItemVO": {
+        "types.CreateReviewRequest": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
-                "id": {
+                "content": {
+                    "type": "string"
+                },
+                "is_anonymous": {
+                    "type": "boolean"
+                },
+                "parentID": {
                     "type": "integer"
                 },
-                "name": {
-                    "type": "string"
+                "pic_info": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "productID": {
+                    "type": "integer"
+                },
+                "stars": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.LikeRequest": {
+            "type": "object",
+            "properties": {
+                "review_id": {
+                    "type": "integer"
                 }
             }
         }
