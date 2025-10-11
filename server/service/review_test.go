@@ -8,11 +8,19 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/dao/mocks"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/model"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/types"
 )
+
+func init() {
+	// 初始化测试用logger
+	logger, _ := zap.NewDevelopment()
+	log.Logger = logger.Sugar()
+}
 
 func TestCreateReview_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -68,4 +76,42 @@ func TestLike_Success(t *testing.T) {
 
 	err := svc.Like(context.Background(), types.LikeRequest{ReviewID: reviewID}, userID)
 	assert.NoError(t, err)
+}
+
+func TestLike_HIncrFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := 100
+	reviewIdStr := strconv.Itoa(reviewID)
+	userID := 77
+
+	// HIncr returns error
+	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewIdStr, 1).Return(assert.AnError)
+
+	err := svc.Like(context.Background(), types.LikeRequest{ReviewID: reviewID}, userID)
+	assert.Error(t, err)
+}
+
+func TestLike_SAddFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := 101
+	reviewIdStr := strconv.Itoa(reviewID)
+	userID := 88
+
+	// HIncr succeeds
+	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewIdStr, 1).Return(nil)
+	// SAdd fails
+	mockDao.EXPECT().SAdd(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes", reviewIdStr).Return(assert.AnError)
+
+	err := svc.Like(context.Background(), types.LikeRequest{ReviewID: reviewID}, userID)
+	assert.Error(t, err)
 }
