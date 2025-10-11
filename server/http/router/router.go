@@ -39,6 +39,7 @@ func NewRouter() *gin.Engine {
 	{
 		customerGroup.Use(middleware.AuthMiddleware())
 		customerGroup.POST("/create", api.CreateReview)
+		customerGroup.POST("/like", api.Like)
 	}
 	return r
 }

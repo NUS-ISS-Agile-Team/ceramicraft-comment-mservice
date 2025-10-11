@@ -22,3 +22,7 @@ mongo:
   host: "mongo-container"
   port: "27017"
   database: "comment_db"
+
+redis:
+  host: "redis-container"
+  port: 6379

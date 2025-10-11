@@ -36,3 +36,30 @@ func CreateReview(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, RespSuccess(c, "create review success"))
 }
+
+// Like review
+// @Summary Like a review
+// @Description Like a review by id
+// @Tags Review
+// @Accept json
+// @Produce json
+// @Param user body types.LikeRequest true "LikeRequest"
+// @Param client path string true "Client identifier" Enums(customer, merchant)
+// @Success 200 {object} data.BaseResponse{data=string}
+// @Failure 400 {object} data.BaseResponse{data=string}
+// @Failure 500 {object} data.BaseResponse{data=string}
+// @Router /comment-ms/v1/customer/like [post]
+func Like(c *gin.Context) {
+	var req types.LikeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	userID := c.Value("userID").(int)
+	err := service.GetReviewServiceInstance().Like(c, req, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, RespSuccess(c, "like success"))
+}

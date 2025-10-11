@@ -24,6 +24,11 @@ definitions:
       stars:
         type: integer
     type: object
+  types.LikeRequest:
+    properties:
+      review_id:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -78,6 +83,59 @@ paths:
                   type: string
               type: object
       summary: Review Create
+      tags:
+      - Review
+  /comment-ms/v1/customer/like:
+    post:
+      consumes:
+      - application/json
+      description: Like a review by id
+      parameters:
+      - description: LikeRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.LikeRequest'
+      - description: Client identifier
+        enum:
+        - customer
+        - merchant
+        in: path
+        name: client
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Like a review
       tags:
       - Review
 swagger: "2.0"

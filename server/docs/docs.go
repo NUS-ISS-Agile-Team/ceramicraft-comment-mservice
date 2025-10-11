@@ -107,6 +107,99 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/comment-ms/v1/customer/like": {
+            "post": {
+                "description": "Like a review by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Like a review",
+                "parameters": [
+                    {
+                        "description": "LikeRequest",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.LikeRequest"
+                        }
+                    },
+                    {
+                        "enum": [
+                            "customer",
+                            "merchant"
+                        ],
+                        "type": "string",
+                        "description": "Client identifier",
+                        "name": "client",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -144,6 +237,14 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "stars": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.LikeRequest": {
+            "type": "object",
+            "properties": {
+                "review_id": {
                     "type": "integer"
                 }
             }

@@ -6,9 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	Config = &Conf{}
-)
+var Config = &Conf{}
 
 type Conf struct {
 	GrpcConfig  *GrpcConfig    `mapstructure:"grpc"`
@@ -16,6 +14,12 @@ type Conf struct {
 	HttpConfig  *HttpConfig    `mapstructure:"http"`
 	MySQLConfig *MySQL         `mapstructure:"mysql"`
 	MongoConfig *MongoDBConfig `mapstructure:"mongo"`
+	RedisConfig *RedisConfig   `mapstructure:"redis"`
+}
+
+type RedisConfig struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
 }
 
 type MongoDBConfig struct {
