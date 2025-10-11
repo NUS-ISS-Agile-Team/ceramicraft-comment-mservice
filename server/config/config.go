@@ -49,9 +49,15 @@ type MySQL struct {
 	DBName   string `mapstructure:"dbName"`
 }
 
+var useLocalConfig = false
+
 func Init() {
 	workDir, _ := os.Getwd()
-	viper.SetConfigName("config")
+	if useLocalConfig {
+		viper.SetConfigName("config-local")
+	} else {
+		viper.SetConfigName("config")
+	}
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(workDir + "/resources")
 	viper.AddConfigPath(workDir)
@@ -63,11 +69,5 @@ func Init() {
 	err = viper.Unmarshal(&Config)
 	if err != nil {
 		panic(err)
-	}
-	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
-	if mysqlPassword != "" {
-		Config.MySQLConfig.Password = mysqlPassword
-	} else {
-		panic("MYSQL_PASSWORD environment variable is not set")
 	}
 }

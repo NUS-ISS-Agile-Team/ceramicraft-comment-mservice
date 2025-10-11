@@ -1,0 +1,18 @@
+grpc:
+  host: "0.0.0.0"
+  port: 5001
+  connect_timeout: 3
+  max_pool_size: 200
+
+http:
+  host: "0.0.0.0"
+  port: 8080
+
+log:
+  level: debug
+  file_path: ./logs/ceramicraft-comment-mservice.log
+
+mongo:
+  host: "127.0.0.1"
+  port: "27017"
+  database: "comment_db"

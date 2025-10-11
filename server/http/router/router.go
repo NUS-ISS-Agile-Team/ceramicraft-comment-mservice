@@ -30,28 +30,15 @@ func NewRouter() *gin.Engine {
 		})
 	}
 
-	v1UnAuthed := r.Group(serviceURIPrefix + "/:client")
+	merchantGroup := basicGroup.Group("/merchant")
 	{
-		v1UnAuthed.Use(validateClient())
-		v1UnAuthed.POST("/items", api.CreateItem)
-		v1UnAuthed.GET("/items/:item_id", api.GetItems)
+		merchantGroup.Use(middleware.AuthMiddleware())
 	}
-	v1Authed := r.Group(serviceURIPrefix + "/:client")
+
+	customerGroup := basicGroup.Group("/customer")
 	{
-		v1Authed.Use(validateClient(), middleware.AuthMiddleware())
-		//todo: add authed api
+		customerGroup.Use(middleware.AuthMiddleware())
+		customerGroup.POST("/create", api.CreateReview)
 	}
 	return r
-}
-
-func validateClient() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		client := c.Param("client")
-		if client != "merchant" && client != "customer" {
-			c.JSON(400, gin.H{"error": "Invalid client type"})
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
 }

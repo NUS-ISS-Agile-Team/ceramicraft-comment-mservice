@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/comment-ms/v1/{client}/items": {
+        "/comment-ms/v1/customer/create": {
             "post": {
-                "description": "Create an item record.",
+                "description": "Create an review record.",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +25,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Item"
+                    "Review"
                 ],
-                "summary": "Item Create",
+                "summary": "Review Create",
                 "parameters": [
                     {
-                        "description": "Item information",
+                        "description": "CreateReviewRequest",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/data.ItemVO"
+                            "$ref": "#/definitions/types.CreateReviewRequest"
                         }
                     },
                     {
@@ -62,7 +62,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/data.ItemVO"
+                                            "$ref": "#/definitions/types.CreateReviewRequest"
                                         }
                                     }
                                 }
@@ -107,40 +107,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/comment-ms/v1/{client}/items/{item_id}": {
-            "get": {
-                "description": "Get item information by item ID.",
-                "tags": [
-                    "Item"
-                ],
-                "summary": "Item Query with ID",
-                "parameters": [
-                    {
-                        "enum": [
-                            "customer",
-                            "merchant"
-                        ],
-                        "type": "string",
-                        "description": "Client identifier",
-                        "name": "client",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Item.ID",
-                        "name": "item_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -156,17 +122,29 @@ const docTemplate = `{
                 }
             }
         },
-        "data.ItemVO": {
+        "types.CreateReviewRequest": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
-                "id": {
+                "content": {
+                    "type": "string"
+                },
+                "is_anonymous": {
+                    "type": "boolean"
+                },
+                "parentID": {
                     "type": "integer"
                 },
-                "name": {
-                    "type": "string"
+                "pic_info": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "productID": {
+                    "type": "integer"
+                },
+                "stars": {
+                    "type": "integer"
                 }
             }
         }
