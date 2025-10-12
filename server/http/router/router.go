@@ -40,6 +40,8 @@ func NewRouter() *gin.Engine {
 		customerGroup.Use(middleware.AuthMiddleware())
 		customerGroup.POST("/create", api.CreateReview)
 		customerGroup.POST("/like", api.Like)
+		customerGroup.GET("/list/user", api.GetListByUserID)
+		customerGroup.GET("/list/product/:product_id", api.GetListByProductID)
 	}
 	return r
 }

@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type CreateReviewRequest struct {
 	ProductID   int
 	Content     string
@@ -10,5 +12,19 @@ type CreateReviewRequest struct {
 }
 
 type LikeRequest struct {
-	ReviewID int `json:"review_id"`
+	ReviewID string `json:"review_id"`
+}
+
+type ReviewInfo struct {
+	ID               string    `json:"id"`
+	Content          string    `json:"content"`
+	UserID           int       `json:"user_id"`
+	ProductID        int       `json:"product_id"`
+	ParentID         int       `json:"parent_id"`
+	Stars            int       `json:"stars"`
+	IsAnonymous      bool      `json:"is_anonymous"`
+	PicInfo          []string  `json:"pic_info"`
+	CreatedAt        time.Time `json:"created_at"`
+	Likes            int       `json:"likes"`
+	CurrentUserLiked bool      `json:"current_user_liked"`
 }
