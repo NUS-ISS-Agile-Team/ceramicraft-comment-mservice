@@ -50,6 +50,36 @@ func (mr *MockCommentDaoMockRecorder) Get(ctx, id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCommentDao)(nil).Get), ctx, id)
 }
 
+// GetListByProductID mocks base method.
+func (m *MockCommentDao) GetListByProductID(ctx context.Context, productId int) ([]*model.Comment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetListByProductID", ctx, productId)
+	ret0, _ := ret[0].([]*model.Comment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetListByProductID indicates an expected call of GetListByProductID.
+func (mr *MockCommentDaoMockRecorder) GetListByProductID(ctx, productId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByProductID", reflect.TypeOf((*MockCommentDao)(nil).GetListByProductID), ctx, productId)
+}
+
+// GetListByUserID mocks base method.
+func (m *MockCommentDao) GetListByUserID(ctx context.Context, userID int) ([]*model.Comment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetListByUserID", ctx, userID)
+	ret0, _ := ret[0].([]*model.Comment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetListByUserID indicates an expected call of GetListByUserID.
+func (mr *MockCommentDaoMockRecorder) GetListByUserID(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByUserID", reflect.TypeOf((*MockCommentDao)(nil).GetListByUserID), ctx, userID)
+}
+
 // HIncr mocks base method.
 func (m *MockCommentDao) HIncr(ctx context.Context, key, member string, deta int) error {
 	m.ctrl.T.Helper()
@@ -64,6 +94,21 @@ func (mr *MockCommentDaoMockRecorder) HIncr(ctx, key, member, deta interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HIncr", reflect.TypeOf((*MockCommentDao)(nil).HIncr), ctx, key, member, deta)
 }
 
+// HMGet mocks base method.
+func (m *MockCommentDao) HMGet(ctx context.Context, key string, members []string) (map[string]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HMGet", ctx, key, members)
+	ret0, _ := ret[0].(map[string]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HMGet indicates an expected call of HMGet.
+func (mr *MockCommentDaoMockRecorder) HMGet(ctx, key, members interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HMGet", reflect.TypeOf((*MockCommentDao)(nil).HMGet), ctx, key, members)
+}
+
 // SAdd mocks base method.
 func (m *MockCommentDao) SAdd(ctx context.Context, key, member string) error {
 	m.ctrl.T.Helper()
@@ -76,6 +121,21 @@ func (m *MockCommentDao) SAdd(ctx context.Context, key, member string) error {
 func (mr *MockCommentDaoMockRecorder) SAdd(ctx, key, member interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SAdd", reflect.TypeOf((*MockCommentDao)(nil).SAdd), ctx, key, member)
+}
+
+// SMembers mocks base method.
+func (m *MockCommentDao) SMembers(ctx context.Context, key string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SMembers", ctx, key)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SMembers indicates an expected call of SMembers.
+func (mr *MockCommentDaoMockRecorder) SMembers(ctx, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMembers", reflect.TypeOf((*MockCommentDao)(nil).SMembers), ctx, key)
 }
 
 // Save mocks base method.

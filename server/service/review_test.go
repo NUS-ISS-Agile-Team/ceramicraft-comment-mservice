@@ -65,14 +65,13 @@ func TestLike_Success(t *testing.T) {
 	mockDao := mocks.NewMockCommentDao(ctrl)
 	svc := &ReviewServiceImpl{reviewDao: mockDao}
 
-	reviewID := 99
-	reviewIdStr := strconv.Itoa(reviewID)
+	reviewID := "99"
 	userID := 77
 
 	// Expect HIncr called first
-	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewIdStr, 1).Return(nil)
+	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewID, 1).Return(nil)
 	// Then expect SAdd called
-	mockDao.EXPECT().SAdd(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes", reviewIdStr).Return(nil)
+	mockDao.EXPECT().SAdd(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes", reviewID).Return(nil)
 
 	err := svc.Like(context.Background(), types.LikeRequest{ReviewID: reviewID}, userID)
 	assert.NoError(t, err)
@@ -85,12 +84,11 @@ func TestLike_HIncrFail(t *testing.T) {
 	mockDao := mocks.NewMockCommentDao(ctrl)
 	svc := &ReviewServiceImpl{reviewDao: mockDao}
 
-	reviewID := 100
-	reviewIdStr := strconv.Itoa(reviewID)
+	reviewID := "100"
 	userID := 77
 
 	// HIncr returns error
-	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewIdStr, 1).Return(assert.AnError)
+	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewID, 1).Return(assert.AnError)
 
 	err := svc.Like(context.Background(), types.LikeRequest{ReviewID: reviewID}, userID)
 	assert.Error(t, err)
@@ -103,14 +101,13 @@ func TestLike_SAddFail(t *testing.T) {
 	mockDao := mocks.NewMockCommentDao(ctrl)
 	svc := &ReviewServiceImpl{reviewDao: mockDao}
 
-	reviewID := 101
-	reviewIdStr := strconv.Itoa(reviewID)
+	reviewID := "101"
 	userID := 88
 
 	// HIncr succeeds
-	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewIdStr, 1).Return(nil)
+	mockDao.EXPECT().HIncr(gomock.Any(), "review_likes", reviewID, 1).Return(nil)
 	// SAdd fails
-	mockDao.EXPECT().SAdd(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes", reviewIdStr).Return(assert.AnError)
+	mockDao.EXPECT().SAdd(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes", reviewID).Return(assert.AnError)
 
 	err := svc.Like(context.Background(), types.LikeRequest{ReviewID: reviewID}, userID)
 	assert.Error(t, err)

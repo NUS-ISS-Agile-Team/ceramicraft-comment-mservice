@@ -27,6 +27,33 @@ definitions:
   types.LikeRequest:
     properties:
       review_id:
+        type: string
+    type: object
+  types.ReviewInfo:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      current_user_liked:
+        type: boolean
+      id:
+        type: string
+      is_anonymous:
+        type: boolean
+      likes:
+        type: integer
+      parent_id:
+        type: integer
+      pic_info:
+        items:
+          type: string
+        type: array
+      product_id:
+        type: integer
+      stars:
+        type: integer
+      user_id:
         type: integer
     type: object
 info:
@@ -136,6 +163,109 @@ paths:
                   type: string
               type: object
       summary: Like a review
+      tags:
+      - Review
+  /comment-ms/v1/customer/list/product/{product_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get list of reviews for a product
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      - description: Client identifier
+        enum:
+        - customer
+        - merchant
+        in: path
+        name: client
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/types.ReviewInfo'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get reviews by product
+      tags:
+      - Review
+  /comment-ms/v1/customer/list/user:
+    get:
+      consumes:
+      - application/json
+      description: Get list of reviews created by current authenticated user
+      parameters:
+      - description: Client identifier
+        enum:
+        - customer
+        - merchant
+        in: path
+        name: client
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/types.ReviewInfo'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Get reviews by user
       tags:
       - Review
 swagger: "2.0"
