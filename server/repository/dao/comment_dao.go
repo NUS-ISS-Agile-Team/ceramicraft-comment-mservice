@@ -118,7 +118,11 @@ func (c *CommentDaoImpl) GetListByUserID(ctx context.Context, userID int) (list 
 		log.Logger.Errorf("Find by user_id failed\tuser_id=%d\terr=%v", userID, err)
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Logger.Errorf("failed to close cursor: %v", err)
+		}
+	}()
 	var results []*model.Comment
 	for cursor.Next(ctx) {
 		var cm model.Comment
@@ -146,7 +150,11 @@ func (c *CommentDaoImpl) GetListByProductID(ctx context.Context, productId int) 
 		log.Logger.Errorf("Find by product_id failed\tproduct_id=%d\terr=%v", productId, err)
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Logger.Errorf("failed to close cursor: %v", err)
+		}
+	}()
 	var results []*model.Comment
 	for cursor.Next(ctx) {
 		var cm model.Comment
