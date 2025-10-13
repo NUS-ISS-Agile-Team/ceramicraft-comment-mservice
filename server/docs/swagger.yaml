@@ -29,6 +29,20 @@ definitions:
       review_id:
         type: string
     type: object
+  types.ListReviewResponse:
+    properties:
+      pinned_review:
+        $ref: '#/definitions/types.ReviewInfo'
+      review_list:
+        items:
+          $ref: '#/definitions/types.ReviewInfo'
+        type: array
+    type: object
+  types.PinReviewRequest:
+    properties:
+      review_id:
+        type: string
+    type: object
   types.ReviewInfo:
     properties:
       content:
@@ -194,9 +208,7 @@ paths:
             - $ref: '#/definitions/data.BaseResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/types.ReviewInfo'
-                  type: array
+                  $ref: '#/definitions/types.ListReviewResponse'
               type: object
         "400":
           description: Bad Request
@@ -266,6 +278,51 @@ paths:
                   type: string
               type: object
       summary: Get reviews by user
+      tags:
+      - Review
+  /comment-ms/v1/merchant/pin:
+    post:
+      consumes:
+      - application/json
+      description: Pin a review by id
+      parameters:
+      - description: PinReviewRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.PinReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Pin a review
       tags:
       - Review
 swagger: "2.0"

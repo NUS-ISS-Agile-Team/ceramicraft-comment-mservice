@@ -33,6 +33,7 @@ func NewRouter() *gin.Engine {
 	merchantGroup := basicGroup.Group("/merchant")
 	{
 		merchantGroup.Use(middleware.AuthMiddleware())
+		merchantGroup.POST("/pin", api.PinReview)
 	}
 
 	customerGroup := basicGroup.Group("/customer")

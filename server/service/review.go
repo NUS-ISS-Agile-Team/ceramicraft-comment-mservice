@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
@@ -15,10 +16,14 @@ type ReviewService interface {
 	CreateReview(ctx context.Context, req types.CreateReviewRequest, userID int) (err error)
 	Like(ctx context.Context, req types.LikeRequest, userID int) (err error)
 	GetListByUserID(ctx context.Context, userID int) (list []types.ReviewInfo, err error)
-	GetListByProductID(ctx context.Context, productId int, userID int) (list []types.ReviewInfo, err error)
+	GetListByProductID(ctx context.Context, productId int, userID int) (resp types.ListReviewResponse, err error)
+	PinReview(ctx context.Context, reviewID string) (err error)
 }
 
-const reviewLikesCntKey = "review_likes"
+const (
+	reviewLikesCntKey = "review_likes"
+	pinnedReviewKey   = "pinned_reviews"
+)
 
 type ReviewServiceImpl struct {
 	reviewDao dao.CommentDao
@@ -46,6 +51,42 @@ func ExistInSlice(lists []string, tar string) bool {
 		}
 	}
 	return false
+}
+
+func (r *ReviewServiceImpl) getReviewDetail(ctx context.Context, reviewID string, userID int) (detail types.ReviewInfo, err error) {
+	reviewInfoRaw, err := r.reviewDao.Get(ctx, reviewID)
+	if err != nil {
+		return types.ReviewInfo{}, err
+	}
+
+	likesCntStr, err := r.reviewDao.HGet(ctx, reviewLikesCntKey, reviewID)
+	if err != nil {
+		return types.ReviewInfo{}, err
+	}
+
+	likesCnt, _ := strconv.Atoi(likesCntStr)
+
+	userLikesReviewSetKey := fmt.Sprintf("user:%d:likes", userID)
+	likedReviewList, err := r.reviewDao.SMembers(ctx, userLikesReviewSetKey)
+	if err != nil {
+		return types.ReviewInfo{}, err
+	}
+
+	curUserLiked := ExistInSlice(likedReviewList, reviewID)
+
+	return types.ReviewInfo{
+		ID:               reviewInfoRaw.ID,
+		Content:          reviewInfoRaw.Content,
+		ParentID:         reviewInfoRaw.ParentID,
+		ProductID:        reviewInfoRaw.ProductID,
+		UserID:           reviewInfoRaw.UserID,
+		Stars:            reviewInfoRaw.Stars,
+		IsAnonymous:      reviewInfoRaw.IsAnonymous,
+		PicInfo:          reviewInfoRaw.PicInfo,
+		CreatedAt:        reviewInfoRaw.CreatedAt,
+		Likes:            likesCnt,
+		CurrentUserLiked: curUserLiked,
+	}, nil
 }
 
 func (r *ReviewServiceImpl) buildReviewInfoList(ctx context.Context, listRaw []*model.Comment, userID int) (list []types.ReviewInfo, err error) {
@@ -89,13 +130,42 @@ func (r *ReviewServiceImpl) buildReviewInfoList(ctx context.Context, listRaw []*
 	return ans, nil
 }
 
-func (r *ReviewServiceImpl) GetListByProductID(ctx context.Context, productId int, userID int) (list []types.ReviewInfo, err error) {
+func (r *ReviewServiceImpl) GetListByProductID(ctx context.Context, productId int, userID int) (resp types.ListReviewResponse, err error) {
+	// 1. get review list
 	listRaw, err := r.reviewDao.GetListByProductID(ctx, productId)
 	if err != nil {
-		return nil, err
+		return types.ListReviewResponse{}, err
 	}
 
-	return r.buildReviewInfoList(ctx, listRaw, userID)
+	list, err := r.buildReviewInfoList(ctx, listRaw, userID)
+	if err != nil {
+		return types.ListReviewResponse{}, err
+	}
+
+	// 2. get pinned review
+	productIdStr := strconv.Itoa(productId)
+	commentIdStr, err := r.reviewDao.HGet(ctx, pinnedReviewKey, productIdStr)
+	if err != nil {
+		return types.ListReviewResponse{}, err
+	}
+
+	// 3. build result
+	var pinnedReviewDetail types.ReviewInfo
+	if commentIdStr != "" {
+		pinnedReviewDetail, err = r.getReviewDetail(ctx, commentIdStr, userID)
+		if err != nil {
+			return types.ListReviewResponse{}, err
+		}
+		return types.ListReviewResponse{
+			ReviewList:   list,
+			PinnedReview: &pinnedReviewDetail,
+		}, nil
+	}
+
+	return types.ListReviewResponse{
+		ReviewList:   list,
+		PinnedReview: nil,
+	}, nil
 }
 
 func (r *ReviewServiceImpl) CreateReview(ctx context.Context, req types.CreateReviewRequest, userID int) (err error) {
@@ -125,4 +195,15 @@ func (r *ReviewServiceImpl) Like(ctx context.Context, req types.LikeRequest, use
 		return err
 	}
 	return nil
+}
+
+func (r *ReviewServiceImpl) PinReview(ctx context.Context, reviewID string) (err error) {
+	commentRaw, err := r.reviewDao.Get(ctx, reviewID)
+	if err != nil {
+		return err
+	}
+
+	productIdStr := strconv.Itoa(commentRaw.ProductID)
+
+	return r.reviewDao.HSet(ctx, pinnedReviewKey, productIdStr, reviewID)
 }

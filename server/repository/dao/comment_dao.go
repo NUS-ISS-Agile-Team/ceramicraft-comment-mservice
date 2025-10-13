@@ -26,6 +26,9 @@ type CommentDao interface {
 	GetListByProductID(ctx context.Context, productId int) (list []*model.Comment, err error)
 	HMGet(ctx context.Context, key string, members []string) (likesCntMap map[string]int, err error)
 	SMembers(ctx context.Context, key string) (likedReviewIds []string, err error)
+	HGet(ctx context.Context, key string, member string) (value string, err error)
+	HDel(ctx context.Context, key string, member string) (err error)
+	HSet(ctx context.Context, key string, member string, value string) (err error)
 }
 
 var (
@@ -222,8 +225,63 @@ func (c *CommentDaoImpl) SMembers(ctx context.Context, key string) (likedReviewI
 	}
 	vals, err := c.redisClient.SMembers(ctx, key).Result()
 	if err != nil {
+		if err == redis.Nil {
+			return nil, nil
+		}
 		log.Logger.Errorf("SMembers failed\tkey=%s\terr=%v", key, err)
 		return nil, err
 	}
 	return vals, nil
+}
+
+func (c *CommentDaoImpl) HGet(ctx context.Context, key string, member string) (value string, err error) {
+	if c.redisClient == nil {
+		log.Logger.Errorf("redis client is nil")
+		return "", nil
+	}
+	cmd := c.redisClient.HGet(ctx, key, member)
+	if cmd.Err() != nil {
+		// if key/member not exist, HGet returns redis.Nil; propagate that as empty value with nil error or return error?
+		// Follow existing pattern: log and return error
+		if cmd.Err() == redis.Nil {
+			return "", nil
+		}
+		log.Logger.Errorf("HGet failed\tkey=%s\tmember=%s\terr=%v", key, member, cmd.Err())
+		return "", cmd.Err()
+	}
+	val, err := cmd.Result()
+	if err != nil {
+		if err == redis.Nil {
+			return "", nil
+		}
+		log.Logger.Errorf("HGet result failed\tkey=%s\tmember=%s\terr=%v", key, member, err)
+		return "", err
+	}
+	return val, nil
+}
+
+func (c *CommentDaoImpl) HDel(ctx context.Context, key string, member string) (err error) {
+	if c.redisClient == nil {
+		log.Logger.Errorf("redis client is nil")
+		return nil
+	}
+	cmd := c.redisClient.HDel(ctx, key, member)
+	if cmd.Err() != nil {
+		log.Logger.Errorf("HDel failed\tkey=%s\tmember=%s\terr=%v", key, member, cmd.Err())
+		return cmd.Err()
+	}
+	return nil
+}
+
+func (c *CommentDaoImpl) HSet(ctx context.Context, key string, member string, value string) (err error) {
+	if c.redisClient == nil {
+		log.Logger.Errorf("redis client is nil")
+		return nil
+	}
+	cmd := c.redisClient.HSet(ctx, key, member, value)
+	if cmd.Err() != nil {
+		log.Logger.Errorf("HSet failed\tkey=%s\tmember=%s\tvalue=%s\terr=%v", key, member, value, cmd.Err())
+		return cmd.Err()
+	}
+	return nil
 }

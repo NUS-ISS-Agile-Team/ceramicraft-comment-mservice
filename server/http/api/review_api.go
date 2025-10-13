@@ -94,7 +94,7 @@ func GetListByUserID(c *gin.Context) {
 // @Produce json
 // @Param product_id path int true "Product ID"
 // @Param client path string true "Client identifier" Enums(customer, merchant)
-// @Success 200 {object} data.BaseResponse{data=[]types.ReviewInfo}
+// @Success 200 {object} data.BaseResponse{data=types.ListReviewResponse}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
 // @Router /comment-ms/v1/customer/list/product/{product_id} [get]
@@ -115,4 +115,29 @@ func GetListByProductID(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, RespSuccess(c, list))
+}
+
+// Pin review
+// @Summary Pin a review
+// @Description Pin a review by id
+// @Tags Review
+// @Accept json
+// @Produce json
+// @Param user body types.PinReviewRequest true "PinReviewRequest"
+// @Success 200 {object} data.BaseResponse{data=string}
+// @Failure 400 {object} data.BaseResponse{data=string}
+// @Failure 500 {object} data.BaseResponse{data=string}
+// @Router /comment-ms/v1/merchant/pin [post]
+func PinReview(c *gin.Context) {
+	var req types.PinReviewRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	err := service.GetReviewServiceInstance().PinReview(c, req.ReviewID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, RespSuccess(c, "pin success"))
 }
