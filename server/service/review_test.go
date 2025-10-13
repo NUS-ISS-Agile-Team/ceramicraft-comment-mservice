@@ -191,7 +191,7 @@ func TestGetListByProductID_Success(t *testing.T) {
 	list, err := svc.GetListByProductID(context.Background(), productID, userID)
 	assert.NoError(t, err)
 	assert.Len(t, list, 1)
-	ri := list[0]
+	ri := list.ReviewList[0]
 	assert.Equal(t, cm.ID, ri.ID)
 	assert.Equal(t, 2, ri.Likes)
 	assert.False(t, ri.CurrentUserLiked)

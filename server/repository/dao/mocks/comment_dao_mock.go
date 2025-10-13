@@ -80,6 +80,35 @@ func (mr *MockCommentDaoMockRecorder) GetListByUserID(ctx, userID interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByUserID", reflect.TypeOf((*MockCommentDao)(nil).GetListByUserID), ctx, userID)
 }
 
+// HDel mocks base method.
+func (m *MockCommentDao) HDel(ctx context.Context, key, member string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HDel", ctx, key, member)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// HDel indicates an expected call of HDel.
+func (mr *MockCommentDaoMockRecorder) HDel(ctx, key, member interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HDel", reflect.TypeOf((*MockCommentDao)(nil).HDel), ctx, key, member)
+}
+
+// HGet mocks base method.
+func (m *MockCommentDao) HGet(ctx context.Context, key, member string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HGet", ctx, key, member)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HGet indicates an expected call of HGet.
+func (mr *MockCommentDaoMockRecorder) HGet(ctx, key, member interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HGet", reflect.TypeOf((*MockCommentDao)(nil).HGet), ctx, key, member)
+}
+
 // HIncr mocks base method.
 func (m *MockCommentDao) HIncr(ctx context.Context, key, member string, deta int) error {
 	m.ctrl.T.Helper()
@@ -107,6 +136,20 @@ func (m *MockCommentDao) HMGet(ctx context.Context, key string, members []string
 func (mr *MockCommentDaoMockRecorder) HMGet(ctx, key, members interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HMGet", reflect.TypeOf((*MockCommentDao)(nil).HMGet), ctx, key, members)
+}
+
+// HSet mocks base method.
+func (m *MockCommentDao) HSet(ctx context.Context, key, member, value string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HSet", ctx, key, member, value)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// HSet indicates an expected call of HSet.
+func (mr *MockCommentDaoMockRecorder) HSet(ctx, key, member, value interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HSet", reflect.TypeOf((*MockCommentDao)(nil).HSet), ctx, key, member, value)
 }
 
 // SAdd mocks base method.
