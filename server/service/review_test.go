@@ -244,3 +244,42 @@ func TestDeleteReview_Success_Pinned(t *testing.T) {
 	err := svc.DeleteReview(context.Background(), reviewID)
 	assert.NoError(t, err)
 }
+
+func TestGetReviewDetail_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "g1"
+	userID := 999
+	now := time.Now()
+
+	// mock Get
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{
+		ID:          reviewID,
+		Content:     "detail content",
+		ParentID:    0,
+		ProductID:   11,
+		UserID:      123,
+		Stars:       4,
+		IsAnonymous: false,
+		PicInfo:     []string{"img1"},
+		CreatedAt:   now,
+	}, nil)
+
+	// mock HGet for likes
+	mockDao.EXPECT().HGet(gomock.Any(), reviewLikesCntKey, reviewID).Return("7", nil)
+
+	// mock SMembers for current user liked set
+	mockDao.EXPECT().SMembers(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes").Return([]string{reviewID}, nil)
+
+	detail, err := svc.getReviewDetail(context.Background(), reviewID, userID)
+	assert.NoError(t, err)
+	assert.Equal(t, reviewID, detail.ID)
+	assert.Equal(t, "detail content", detail.Content)
+	assert.Equal(t, 7, detail.Likes)
+	assert.True(t, detail.CurrentUserLiked)
+	assert.WithinDuration(t, now, detail.CreatedAt, time.Second)
+}
