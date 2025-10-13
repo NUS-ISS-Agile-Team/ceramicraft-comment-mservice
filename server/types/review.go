@@ -28,3 +28,12 @@ type ReviewInfo struct {
 	Likes            int       `json:"likes"`
 	CurrentUserLiked bool      `json:"current_user_liked"`
 }
+
+type PinReviewRequest struct {
+	ReviewID string `json:"review_id"`
+}
+
+type ListReviewResponse struct {
+	ReviewList   []ReviewInfo `json:"review_list"`
+	PinnedReview *ReviewInfo   `json:"pinned_review"`
+}
