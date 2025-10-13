@@ -188,11 +188,15 @@ func TestGetListByProductID_Success(t *testing.T) {
 
 	mockDao.EXPECT().SMembers(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes").Return([]string{}, nil)
 
-	list, err := svc.GetListByProductID(context.Background(), productID, userID)
+	// No pinned review for this product
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("", nil)
+
+	resp, err := svc.GetListByProductID(context.Background(), productID, userID)
 	assert.NoError(t, err)
-	assert.Len(t, list, 1)
-	ri := list.ReviewList[0]
+	assert.Len(t, resp.ReviewList, 1)
+	ri := resp.ReviewList[0]
 	assert.Equal(t, cm.ID, ri.ID)
 	assert.Equal(t, 2, ri.Likes)
 	assert.False(t, ri.CurrentUserLiked)
+	assert.Nil(t, resp.PinnedReview)
 }
