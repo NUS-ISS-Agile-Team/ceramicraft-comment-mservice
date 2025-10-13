@@ -141,3 +141,28 @@ func PinReview(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, RespSuccess(c, "pin success"))
 }
+
+// Delete review
+// @Summary Delete a review
+// @Description Delete a review by id
+// @Tags Review
+// @Accept json
+// @Produce json
+// @Param review_id path string true "Review ID"
+// @Success 200 {object} data.BaseResponse{data=string}
+// @Failure 400 {object} data.BaseResponse{data=string}
+// @Failure 500 {object} data.BaseResponse{data=string}
+// @Router /comment-ms/v1/merchant/review/{review_id} [delete]
+func DeleteReview(c *gin.Context) {
+	reviewID := c.Param("review_id")
+	if reviewID == "" {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: "empty review_id"})
+		return
+	}
+	err := service.GetReviewServiceInstance().DeleteReview(c, reviewID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, RespSuccess(c, "delete success"))
+}

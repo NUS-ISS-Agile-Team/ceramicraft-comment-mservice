@@ -20,6 +20,7 @@ import (
 type CommentDao interface {
 	Save(ctx context.Context, comment *model.Comment) error
 	Get(ctx context.Context, id string) (*model.Comment, error)
+	Delete(ctx context.Context, id string) (err error)
 	HIncr(ctx context.Context, key string, member string, deta int) (err error)
 	SAdd(ctx context.Context, key string, member string) (err error)
 	GetListByUserID(ctx context.Context, userID int) (list []*model.Comment, err error)
@@ -94,6 +95,25 @@ func (c *CommentDaoImpl) HIncr(ctx context.Context, key string, member string, d
 	if cmd.Err() != nil {
 		log.Logger.Errorf("HIncr failed\tkey=%s\tmember=%s\tdeta=%d\terr=%v", key, member, deta, cmd.Err())
 		return cmd.Err()
+	}
+	return nil
+}
+
+// Delete removes a comment document by its hex id
+func (c *CommentDaoImpl) Delete(ctx context.Context, id string) (err error) {
+	if c.collection == nil {
+		log.Logger.Errorf("mongo collection is nil")
+		return nil
+	}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Logger.Errorf("parse id failed. id=%s err=%v", id, err)
+		return err
+	}
+	_, err = c.collection.DeleteOne(ctx, bson.M{"_id": objectID})
+	if err != nil {
+		log.Logger.Errorf("DeleteOne failed id=%s err=%v", id, err)
+		return err
 	}
 	return nil
 }

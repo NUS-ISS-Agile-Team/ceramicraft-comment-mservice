@@ -18,6 +18,7 @@ type ReviewService interface {
 	GetListByUserID(ctx context.Context, userID int) (list []types.ReviewInfo, err error)
 	GetListByProductID(ctx context.Context, productId int, userID int) (resp types.ListReviewResponse, err error)
 	PinReview(ctx context.Context, reviewID string) (err error)
+	DeleteReview(ctx context.Context, reviewID string) (err error)
 }
 
 const (
@@ -206,4 +207,38 @@ func (r *ReviewServiceImpl) PinReview(ctx context.Context, reviewID string) (err
 	productIdStr := strconv.Itoa(commentRaw.ProductID)
 
 	return r.reviewDao.HSet(ctx, pinnedReviewKey, productIdStr, reviewID)
+}
+
+func (r *ReviewServiceImpl) DeleteReview(ctx context.Context, reviewID string) (err error) {
+	// get comment to know product id
+	commentRaw, err := r.reviewDao.Get(ctx, reviewID)
+	if err != nil {
+		return err
+	}
+
+	// delete from mongo
+	if err := r.reviewDao.Delete(ctx, reviewID); err != nil {
+		return err
+	}
+
+	// remove likes hash field
+	if err := r.reviewDao.HDel(ctx, reviewLikesCntKey, reviewID); err != nil {
+		return err
+	}
+
+	// remove from any user's liked sets is optional (could be many) - skip
+
+	// if this review was pinned for the product, delete pinned mapping
+	productIdStr := strconv.Itoa(commentRaw.ProductID)
+	pinnedId, err := r.reviewDao.HGet(ctx, pinnedReviewKey, productIdStr)
+	if err != nil {
+		return err
+	}
+	if pinnedId == reviewID {
+		if err := r.reviewDao.HDel(ctx, pinnedReviewKey, productIdStr); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
