@@ -200,3 +200,22 @@ func TestGetListByProductID_Success(t *testing.T) {
 	assert.False(t, ri.CurrentUserLiked)
 	assert.Nil(t, resp.PinnedReview)
 }
+
+func TestPinReview_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "r123"
+	productID := 42
+
+	// Expect Get to return comment with ProductID
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	// Expect HSet to be called with pinnedReviewKey, productIdStr, reviewID
+	mockDao.EXPECT().HSet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID), reviewID).Return(nil)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.NoError(t, err)
+}
