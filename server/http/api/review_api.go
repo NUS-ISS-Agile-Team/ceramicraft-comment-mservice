@@ -117,6 +117,35 @@ func GetListByProductID(c *gin.Context) {
 	c.JSON(http.StatusOK, RespSuccess(c, list))
 }
 
+// ListReviewsByFilter
+// @Summary List reviews by product and stars
+// @Description Filter reviews by product_id and stars (0 means any), ordered by created_at desc
+// @Tags Review
+// @Accept json
+// @Produce json
+// @Param filter body types.ListReviewRequest true "ListReviewRequest"
+// @Success 200 {object} data.BaseResponse{data=[]types.ReviewInfo}
+// @Failure 400 {object} data.BaseResponse{data=string}
+// @Failure 500 {object} data.BaseResponse{data=string}
+// @Router /comment-ms/v1/merchant/list [post]
+func ListReviewsByFilter(c *gin.Context) {
+	var req types.ListReviewRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	userID := 0
+	if v := c.Value("userID"); v != nil {
+		userID = v.(int)
+	}
+	resp, err := service.GetReviewServiceInstance().GetListByQuery(c, req, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, RespSuccess(c, resp))
+}
+
 // Pin review
 // @Summary Pin a review
 // @Description Pin a review by id

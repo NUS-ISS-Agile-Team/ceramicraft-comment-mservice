@@ -79,6 +79,21 @@ func (mr *MockCommentDaoMockRecorder) GetListByProductID(ctx, productId interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByProductID", reflect.TypeOf((*MockCommentDao)(nil).GetListByProductID), ctx, productId)
 }
 
+// GetListByQuery mocks base method.
+func (m *MockCommentDao) GetListByQuery(ctx context.Context, productId, stars int) ([]*model.Comment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetListByQuery", ctx, productId, stars)
+	ret0, _ := ret[0].([]*model.Comment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetListByQuery indicates an expected call of GetListByQuery.
+func (mr *MockCommentDaoMockRecorder) GetListByQuery(ctx, productId, stars interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByQuery", reflect.TypeOf((*MockCommentDao)(nil).GetListByQuery), ctx, productId, stars)
+}
+
 // GetListByUserID mocks base method.
 func (m *MockCommentDao) GetListByUserID(ctx context.Context, userID int) ([]*model.Comment, error) {
 	m.ctrl.T.Helper()
