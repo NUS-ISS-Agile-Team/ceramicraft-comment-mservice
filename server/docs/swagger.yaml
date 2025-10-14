@@ -14,7 +14,7 @@ definitions:
       is_anonymous:
         type: boolean
       parentID:
-        type: integer
+        type: string
       pic_info:
         items:
           type: string
@@ -66,7 +66,7 @@ definitions:
       likes:
         type: integer
       parent_id:
-        type: integer
+        type: string
       pic_info:
         items:
           type: string
@@ -379,6 +379,51 @@ paths:
                   type: string
               type: object
       summary: Pin a review
+      tags:
+      - Review
+  /comment-ms/v1/merchant/reply:
+    post:
+      consumes:
+      - application/json
+      description: Reply an review record.
+      parameters:
+      - description: CreateReviewRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/types.CreateReviewRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Review Reply
       tags:
       - Review
   /comment-ms/v1/merchant/review/{review_id}:
