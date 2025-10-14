@@ -585,3 +585,76 @@ func TestDeleteReview_Pinned_Success(t *testing.T) {
 	err := svc.DeleteReview(context.Background(), reviewID)
 	assert.NoError(t, err)
 }
+
+func TestGetListByQuery_HMGetError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	req := types.ListReviewRequest{ProductID: 300, Stars: 4}
+
+	mockDao.EXPECT().GetListByQuery(gomock.Any(), req.ProductID, req.Stars).Return([]*model.Comment{{ID: "a1"}}, nil)
+	mockDao.EXPECT().HMGet(gomock.Any(), reviewLikesCntKey, gomock.AssignableToTypeOf([]string{})).Return(nil, assert.AnError)
+
+	_, err := svc.GetListByQuery(context.Background(), req, 0)
+	assert.Error(t, err)
+}
+
+func TestGetListByQuery_SMembersError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	req := types.ListReviewRequest{ProductID: 301, Stars: 5}
+
+	mockDao.EXPECT().GetListByQuery(gomock.Any(), req.ProductID, req.Stars).Return([]*model.Comment{{ID: "b1"}}, nil)
+	mockDao.EXPECT().HMGet(gomock.Any(), reviewLikesCntKey, gomock.AssignableToTypeOf([]string{})).Return(map[string]int{"b1": 1}, nil)
+	mockDao.EXPECT().SMembers(gomock.Any(), gomock.AssignableToTypeOf("")).Return(nil, assert.AnError)
+
+	_, err := svc.GetListByQuery(context.Background(), req, 0)
+	assert.Error(t, err)
+}
+
+func TestGetListByQuery_DAOError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	req := types.ListReviewRequest{ProductID: 302, Stars: 3}
+
+	mockDao.EXPECT().GetListByQuery(gomock.Any(), req.ProductID, req.Stars).Return(nil, assert.AnError)
+
+	_, err := svc.GetListByQuery(context.Background(), req, 0)
+	assert.Error(t, err)
+}
+
+func TestGetListByQuery_StarsZero_AllStars(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	userID := 77
+	req := types.ListReviewRequest{ProductID: 400, Stars: 0}
+
+	cm1 := &model.Comment{ID: "s1", CreatedAt: time.Now()}
+	cm2 := &model.Comment{ID: "s2", CreatedAt: time.Now().Add(-time.Minute)}
+
+	mockDao.EXPECT().GetListByQuery(gomock.Any(), req.ProductID, req.Stars).Return([]*model.Comment{cm1, cm2}, nil)
+	mockDao.EXPECT().HMGet(gomock.Any(), reviewLikesCntKey, gomock.AssignableToTypeOf([]string{})).Return(map[string]int{"s1": 2, "s2": 0}, nil)
+	mockDao.EXPECT().SMembers(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes").Return([]string{"s1"}, nil)
+
+	list, err := svc.GetListByQuery(context.Background(), req, userID)
+	assert.NoError(t, err)
+	assert.Len(t, list, 2)
+	assert.Equal(t, "s1", list[0].ID)
+	assert.Equal(t, 2, list[0].Likes)
+	assert.True(t, list[0].CurrentUserLiked)
+}
