@@ -546,6 +546,88 @@ const docTemplate = `{
                 }
             }
         },
+        "/comment-ms/v1/merchant/reply": {
+            "post": {
+                "description": "Reply an review record.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Review Reply",
+                "parameters": [
+                    {
+                        "description": "CreateReviewRequest",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateReviewRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/types.CreateReviewRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/comment-ms/v1/merchant/review/{review_id}": {
             "delete": {
                 "description": "Delete a review by id",
@@ -650,7 +732,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "parentID": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "pic_info": {
                     "type": "array",
@@ -730,7 +812,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "parent_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "pic_info": {
                     "type": "array",

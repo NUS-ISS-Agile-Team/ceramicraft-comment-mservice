@@ -5,7 +5,7 @@ import "time"
 type CreateReviewRequest struct {
 	ProductID   int
 	Content     string
-	ParentID    int
+	ParentID    string
 	Stars       int
 	PicInfo     []string `json:"pic_info"`
 	IsAnonymous bool     `json:"is_anonymous"`
@@ -20,7 +20,7 @@ type ReviewInfo struct {
 	Content          string    `json:"content"`
 	UserID           int       `json:"user_id"`
 	ProductID        int       `json:"product_id"`
-	ParentID         int       `json:"parent_id"`
+	ParentID         string    `json:"parent_id"`
 	Stars            int       `json:"stars"`
 	IsAnonymous      bool      `json:"is_anonymous"`
 	PicInfo          []string  `json:"pic_info"`
