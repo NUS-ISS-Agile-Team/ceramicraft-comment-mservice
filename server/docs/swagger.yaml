@@ -29,6 +29,14 @@ definitions:
       review_id:
         type: string
     type: object
+  types.ListReviewRequest:
+    properties:
+      product_id:
+        type: integer
+      stars:
+        description: 0 means any stars
+        type: integer
+    type: object
   types.ListReviewResponse:
     properties:
       pinned_review:
@@ -278,6 +286,54 @@ paths:
                   type: string
               type: object
       summary: Get reviews by user
+      tags:
+      - Review
+  /comment-ms/v1/merchant/list:
+    post:
+      consumes:
+      - application/json
+      description: Filter reviews by product_id and stars (0 means any), ordered by
+        created_at desc
+      parameters:
+      - description: ListReviewRequest
+        in: body
+        name: filter
+        required: true
+        schema:
+          $ref: '#/definitions/types.ListReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/types.ReviewInfo'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: List reviews by product and stars
       tags:
       - Review
   /comment-ms/v1/merchant/pin:

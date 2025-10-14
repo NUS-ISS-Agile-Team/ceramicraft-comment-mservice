@@ -368,6 +368,91 @@
                 }
             }
         },
+        "/comment-ms/v1/merchant/list": {
+            "post": {
+                "description": "Filter reviews by product_id and stars (0 means any), ordered by created_at desc",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "List reviews by product and stars",
+                "parameters": [
+                    {
+                        "description": "ListReviewRequest",
+                        "name": "filter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListReviewRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/types.ReviewInfo"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/comment-ms/v1/merchant/pin": {
             "post": {
                 "description": "Pin a review by id",
@@ -575,6 +660,18 @@
             "properties": {
                 "review_id": {
                     "type": "string"
+                }
+            }
+        },
+        "types.ListReviewRequest": {
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "stars": {
+                    "description": "0 means any stars",
+                    "type": "integer"
                 }
             }
         },

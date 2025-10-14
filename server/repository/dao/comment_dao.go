@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	options "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type CommentDao interface {
@@ -25,6 +26,7 @@ type CommentDao interface {
 	SAdd(ctx context.Context, key string, member string) (err error)
 	GetListByUserID(ctx context.Context, userID int) (list []*model.Comment, err error)
 	GetListByProductID(ctx context.Context, productId int) (list []*model.Comment, err error)
+	GetListByQuery(ctx context.Context, productId int, stars int) (list []*model.Comment, err error)
 	HMGet(ctx context.Context, key string, members []string) (likesCntMap map[string]int, err error)
 	SMembers(ctx context.Context, key string) (likedReviewIds []string, err error)
 	HGet(ctx context.Context, key string, member string) (value string, err error)
@@ -193,6 +195,52 @@ func (c *CommentDaoImpl) GetListByProductID(ctx context.Context, productId int) 
 	}
 	return results, nil
 }
+
+// GetListByQuery returns comments for a product filtered by stars (if stars>0)
+// and ordered by created_at descending.
+func (c *CommentDaoImpl) GetListByQuery(ctx context.Context, productId int, stars int) (list []*model.Comment, err error) {
+	if c.collection == nil {
+		log.Logger.Errorf("mongo collection is nil")
+		return nil, nil
+	}
+	// build filter
+	filter := bson.M{}
+	if productId > 0 {
+		filter["product_id"] = productId
+	}
+	if stars > 0 {
+		filter["stars"] = stars
+	}
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}})
+
+	cursor, err := c.collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		log.Logger.Errorf("Find by product_id and stars failed\tproduct_id=%d\tstars=%d\terr=%v", productId, stars, err)
+		return nil, err
+	}
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Logger.Errorf("failed to close cursor: %v", err)
+		}
+	}()
+	var results []*model.Comment
+	for cursor.Next(ctx) {
+		var cm model.Comment
+		if err := cursor.Decode(&cm); err != nil {
+			log.Logger.Errorf("Decode comment failed\terr=%v", err)
+			return nil, err
+		}
+		results = append(results, &cm)
+	}
+	if err := cursor.Err(); err != nil {
+		log.Logger.Errorf("cursor iteration error\terr=%v", err)
+		return nil, err
+	}
+	return results, nil
+}
+
+// NOTE: using options.Find() directly above; no helper needed.
 
 func (c *CommentDaoImpl) HMGet(ctx context.Context, key string, members []string) (likesCntMap map[string]int, err error) {
 	likesCntMap = make(map[string]int, len(members))

@@ -35,6 +35,7 @@ func NewRouter() *gin.Engine {
 		merchantGroup.Use(middleware.AuthMiddleware())
 		merchantGroup.POST("/pin", api.PinReview)
 		merchantGroup.DELETE("/review/:review_id", api.DeleteReview)
+		merchantGroup.POST("/list", api.ListReviewsByFilter)
 	}
 
 	customerGroup := basicGroup.Group("/customer")

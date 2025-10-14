@@ -35,5 +35,10 @@ type PinReviewRequest struct {
 
 type ListReviewResponse struct {
 	ReviewList   []ReviewInfo `json:"review_list"`
-	PinnedReview *ReviewInfo   `json:"pinned_review"`
+	PinnedReview *ReviewInfo  `json:"pinned_review"`
+}
+
+type ListReviewRequest struct {
+	ProductID int `json:"product_id"`
+	Stars     int `json:"stars"` // 0 means any stars
 }

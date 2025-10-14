@@ -169,6 +169,23 @@ func (r *ReviewServiceImpl) GetListByProductID(ctx context.Context, productId in
 	}, nil
 }
 
+// GetListByQuery returns list filtered by product and stars (stars==0 means any)
+func (r *ReviewServiceImpl) GetListByQuery(ctx context.Context, req types.ListReviewRequest, userID int) (resp []types.ReviewInfo, err error) {
+	productId := req.ProductID
+	stars := req.Stars
+	listRaw, err := r.reviewDao.GetListByQuery(ctx, productId, stars)
+	if err != nil {
+		return nil, err
+	}
+
+	list, err := r.buildReviewInfoList(ctx, listRaw, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
 func (r *ReviewServiceImpl) CreateReview(ctx context.Context, req types.CreateReviewRequest, userID int) (err error) {
 	return r.reviewDao.Save(ctx, &model.Comment{
 		Content:     req.Content,
