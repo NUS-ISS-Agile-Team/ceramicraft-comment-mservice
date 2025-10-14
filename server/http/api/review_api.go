@@ -220,5 +220,5 @@ func ReplyReview(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, RespSuccess(c, "create review success"))
+	c.JSON(http.StatusOK, RespSuccess(c, "reply review success"))
 }
