@@ -388,3 +388,64 @@ func TestGetReviewDetail_SMembersError(t *testing.T) {
 	_, err := svc.getReviewDetail(context.Background(), reviewID, userID)
 	assert.Error(t, err)
 }
+
+func TestGetListByQuery_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	userID := 123
+	req := types.ListReviewRequest{
+		ProductID: 88,
+		Stars:     5,
+	}
+	// prepare comments
+	cm1 := &model.Comment{
+		ID:          "c1",
+		Content:     "good",
+		UserID:      123,
+		ProductID:   req.ProductID,
+		ParentID:    0,
+		Stars:       req.Stars,
+		PicInfo:     []string{"img1.jpg"},
+		IsAnonymous: false,
+		CreatedAt:   time.Now(),
+	}
+	cm2 := &model.Comment{
+		ID:          "c2",
+		Content:     "excellent",
+		UserID:      456,
+		ProductID:   req.ProductID,
+		ParentID:    0,
+		Stars:       req.Stars,
+		PicInfo:     []string{"img2.jpg"},
+		IsAnonymous: true,
+		CreatedAt:   time.Now().Add(-time.Hour),
+	}
+
+	// Expect DAO method called with correct params
+	mockDao.EXPECT().GetListByQuery(gomock.Any(), req.ProductID, req.Stars).Return([]*model.Comment{cm1, cm2}, nil)
+	// Expect HMGet called with both IDs
+	mockDao.EXPECT().HMGet(gomock.Any(), reviewLikesCntKey, gomock.AssignableToTypeOf([]string{})).DoAndReturn(
+		func(ctx context.Context, key string, members []string) (map[string]int, error) {
+			assert.ElementsMatch(t, []string{"c1", "c2"}, members)
+			return map[string]int{"c1": 10, "c2": 5}, nil
+		})
+	// Expect SMembers for current user's liked set
+	mockDao.EXPECT().SMembers(gomock.Any(), "user:"+strconv.Itoa(userID)+":likes").Return([]string{"c2"}, nil)
+
+	list, err := svc.GetListByQuery(context.Background(), req, userID)
+	assert.NoError(t, err)
+	assert.Len(t, list, 2)
+	// Check order: should be sorted by CreatedAt desc (cm1 newer)
+	assert.Equal(t, "c1", list[0].ID)
+	assert.Equal(t, "c2", list[1].ID)
+	// Likes count
+	assert.Equal(t, 10, list[0].Likes)
+	assert.Equal(t, 5, list[1].Likes)
+	// CurrentUserLiked
+	assert.False(t, list[0].CurrentUserLiked)
+	assert.True(t, list[1].CurrentUserLiked)
+}

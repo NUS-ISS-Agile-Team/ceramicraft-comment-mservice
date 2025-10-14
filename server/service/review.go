@@ -19,6 +19,7 @@ type ReviewService interface {
 	GetListByProductID(ctx context.Context, productId int, userID int) (resp types.ListReviewResponse, err error)
 	PinReview(ctx context.Context, reviewID string) (err error)
 	DeleteReview(ctx context.Context, reviewID string) (err error)
+	GetListByQuery(ctx context.Context, req types.ListReviewRequest, userID int) (resp []types.ReviewInfo, err error)
 }
 
 const (
