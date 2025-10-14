@@ -449,3 +449,139 @@ func TestGetListByQuery_Success(t *testing.T) {
 	assert.False(t, list[0].CurrentUserLiked)
 	assert.True(t, list[1].CurrentUserLiked)
 }
+
+// DeleteReview tests: cover Get failure, Delete failure, HDel(likes) failure,
+// pinned HGet error, pinned HDel failure, and non-pinned success.
+func TestDeleteReview_GetFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "dgetfail"
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(nil, assert.AnError)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestDeleteReview_DeleteFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "ddelfail"
+	productID := 10
+
+	// Get returns comment
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	// Delete fails
+	mockDao.EXPECT().Delete(gomock.Any(), reviewID).Return(assert.AnError)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestDeleteReview_HDelLikesFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "dhdel"
+	productID := 11
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().Delete(gomock.Any(), reviewID).Return(nil)
+	// HDel for likes fails
+	mockDao.EXPECT().HDel(gomock.Any(), reviewLikesCntKey, reviewID).Return(assert.AnError)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestDeleteReview_PinnedHGetFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "dpinnederr"
+	productID := 12
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().Delete(gomock.Any(), reviewID).Return(nil)
+	mockDao.EXPECT().HDel(gomock.Any(), reviewLikesCntKey, reviewID).Return(nil)
+	// HGet for pinned mapping fails
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("", assert.AnError)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestDeleteReview_PinnedHDelFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "dpinnedhdel"
+	productID := 13
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().Delete(gomock.Any(), reviewID).Return(nil)
+	mockDao.EXPECT().HDel(gomock.Any(), reviewLikesCntKey, reviewID).Return(nil)
+	// pinned mapping matches and then HDel fails
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return(reviewID, nil)
+	mockDao.EXPECT().HDel(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return(assert.AnError)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestDeleteReview_NonPinned_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "dok"
+	productID := 21
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().Delete(gomock.Any(), reviewID).Return(nil)
+	mockDao.EXPECT().HDel(gomock.Any(), reviewLikesCntKey, reviewID).Return(nil)
+	// pinned mapping returns different id
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("otherid", nil)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.NoError(t, err)
+}
+
+func TestDeleteReview_Pinned_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "dpinsuccess"
+	productID := 31
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().Delete(gomock.Any(), reviewID).Return(nil)
+	mockDao.EXPECT().HDel(gomock.Any(), reviewLikesCntKey, reviewID).Return(nil)
+	// pinned mapping matches and then remove it successfully
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return(reviewID, nil)
+	mockDao.EXPECT().HDel(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return(nil)
+
+	err := svc.DeleteReview(context.Background(), reviewID)
+	assert.NoError(t, err)
+}
