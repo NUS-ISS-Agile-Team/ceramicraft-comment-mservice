@@ -126,6 +126,7 @@ func (r *ReviewServiceImpl) buildReviewInfoList(ctx context.Context, listRaw []*
 			CreatedAt:        review.CreatedAt,
 			Likes:            likes[review.ID],
 			CurrentUserLiked: curUserLiked,
+			IsPinned:         review.IsPinned,
 		}
 	}
 
