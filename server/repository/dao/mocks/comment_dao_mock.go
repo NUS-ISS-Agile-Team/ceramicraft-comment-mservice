@@ -223,3 +223,17 @@ func (mr *MockCommentDaoMockRecorder) Save(ctx, comment interface{}) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockCommentDao)(nil).Save), ctx, comment)
 }
+
+// UpdateIsPinnedByID mocks base method.
+func (m *MockCommentDao) UpdateIsPinnedByID(ctx context.Context, id string, isPinned bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateIsPinnedByID", ctx, id, isPinned)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateIsPinnedByID indicates an expected call of UpdateIsPinnedByID.
+func (mr *MockCommentDaoMockRecorder) UpdateIsPinnedByID(ctx, id, isPinned interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateIsPinnedByID", reflect.TypeOf((*MockCommentDao)(nil).UpdateIsPinnedByID), ctx, id, isPinned)
+}

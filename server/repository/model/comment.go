@@ -12,6 +12,7 @@ type Comment struct {
 	ParentID    string    `bson:"parent_id" json:"parent_id"`
 	Stars       int       `bson:"stars" json:"stars"`
 	IsAnonymous bool      `bson:"is_anonymous" json:"is_anonymous"`
+	IsPinned    bool      `bson:"is_pinned" json:"is_pinned"`
 	PicInfo     []string  `bson:"pic_info" json:"pic_info"`
 	CreatedAt   time.Time `bson:"created_at" json:"created_at"`
 }
