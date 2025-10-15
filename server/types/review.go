@@ -27,6 +27,7 @@ type ReviewInfo struct {
 	CreatedAt        time.Time `json:"created_at"`
 	Likes            int       `json:"likes"`
 	CurrentUserLiked bool      `json:"current_user_liked"`
+	IsPinned         bool      `json:"is_pinned"`
 }
 
 type PinReviewRequest struct {
