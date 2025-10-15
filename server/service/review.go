@@ -126,6 +126,7 @@ func (r *ReviewServiceImpl) buildReviewInfoList(ctx context.Context, listRaw []*
 			CreatedAt:        review.CreatedAt,
 			Likes:            likes[review.ID],
 			CurrentUserLiked: curUserLiked,
+			IsPinned:         review.IsPinned,
 		}
 	}
 
@@ -223,6 +224,23 @@ func (r *ReviewServiceImpl) PinReview(ctx context.Context, reviewID string) (err
 	}
 
 	productIdStr := strconv.Itoa(commentRaw.ProductID)
+
+	oldCommentID, err := r.reviewDao.HGet(ctx, pinnedReviewKey, productIdStr)
+	if err != nil {
+		return err
+	}
+
+	if oldCommentID != "" {
+		err = r.reviewDao.UpdateIsPinnedByID(ctx, oldCommentID, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = r.reviewDao.UpdateIsPinnedByID(ctx, reviewID, true)
+	if err != nil {
+		return err
+	}
 
 	return r.reviewDao.HSet(ctx, pinnedReviewKey, productIdStr, reviewID)
 }

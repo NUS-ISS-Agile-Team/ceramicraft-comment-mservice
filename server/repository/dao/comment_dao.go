@@ -32,6 +32,7 @@ type CommentDao interface {
 	HGet(ctx context.Context, key string, member string) (value string, err error)
 	HDel(ctx context.Context, key string, member string) (err error)
 	HSet(ctx context.Context, key string, member string, value string) (err error)
+	UpdateIsPinnedByID(ctx context.Context, id string, isPinned bool) error
 }
 
 var (
@@ -350,6 +351,27 @@ func (c *CommentDaoImpl) HSet(ctx context.Context, key string, member string, va
 	if cmd.Err() != nil {
 		log.Logger.Errorf("HSet failed\tkey=%s\tmember=%s\tvalue=%s\terr=%v", key, member, value, cmd.Err())
 		return cmd.Err()
+	}
+	return nil
+}
+
+func (c *CommentDaoImpl) UpdateIsPinnedByID(ctx context.Context, id string, isPinned bool) error {
+	if c.collection == nil {
+		log.Logger.Errorf("mongo collection is nil")
+		return nil
+	}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Logger.Errorf("parse id failed. id=%s err=%v", id, err)
+		return err
+	}
+	filter := bson.M{"_id": objectID}
+	update := bson.M{"$set": bson.M{"is_pinned": isPinned}}
+
+	_, err = c.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Logger.Errorf("UpdateOne failed id=%s err=%v", id, err)
+		return err
 	}
 	return nil
 }

@@ -201,25 +201,6 @@ func TestGetListByProductID_Success(t *testing.T) {
 	assert.Nil(t, resp.PinnedReview)
 }
 
-func TestPinReview_Success(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockDao := mocks.NewMockCommentDao(ctrl)
-	svc := &ReviewServiceImpl{reviewDao: mockDao}
-
-	reviewID := "r123"
-	productID := 42
-
-	// Expect Get to return comment with ProductID
-	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
-	// Expect HSet to be called with pinnedReviewKey, productIdStr, reviewID
-	mockDao.EXPECT().HSet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID), reviewID).Return(nil)
-
-	err := svc.PinReview(context.Background(), reviewID)
-	assert.NoError(t, err)
-}
-
 func TestDeleteReview_Success_Pinned(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -657,4 +638,139 @@ func TestGetListByQuery_StarsZero_AllStars(t *testing.T) {
 	assert.Equal(t, "s1", list[0].ID)
 	assert.Equal(t, 2, list[0].Likes)
 	assert.True(t, list[0].CurrentUserLiked)
+}
+
+// PinReview comprehensive tests
+func TestPinReview_GetFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "pgf"
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(nil, assert.AnError)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestPinReview_HGetFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "phg"
+	productID := 7
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("", assert.AnError)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestPinReview_NoOld_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "pnoold"
+	productID := 8
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	// no old pinned
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("", nil)
+	// set new pinned flag
+	mockDao.EXPECT().UpdateIsPinnedByID(gomock.Any(), reviewID, true).Return(nil)
+	// set mapping
+	mockDao.EXPECT().HSet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID), reviewID).Return(nil)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.NoError(t, err)
+}
+
+func TestPinReview_WithOld_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "pwithold_new"
+	oldID := "pwithold_old"
+	productID := 9
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	// old pinned exists
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return(oldID, nil)
+	// unset old pinned
+	mockDao.EXPECT().UpdateIsPinnedByID(gomock.Any(), oldID, false).Return(nil)
+	// set new pinned
+	mockDao.EXPECT().UpdateIsPinnedByID(gomock.Any(), reviewID, true).Return(nil)
+	// set mapping
+	mockDao.EXPECT().HSet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID), reviewID).Return(nil)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.NoError(t, err)
+}
+
+func TestPinReview_UpdateOldFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "poldfail_new"
+	oldID := "poldfail_old"
+	productID := 10
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return(oldID, nil)
+	mockDao.EXPECT().UpdateIsPinnedByID(gomock.Any(), oldID, false).Return(assert.AnError)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestPinReview_UpdateNewFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "pnewfail"
+	productID := 11
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("", nil)
+	mockDao.EXPECT().UpdateIsPinnedByID(gomock.Any(), reviewID, true).Return(assert.AnError)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.Error(t, err)
+}
+
+func TestPinReview_HSetFail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockDao := mocks.NewMockCommentDao(ctrl)
+	svc := &ReviewServiceImpl{reviewDao: mockDao}
+
+	reviewID := "phsetfail"
+	productID := 12
+
+	mockDao.EXPECT().Get(gomock.Any(), reviewID).Return(&model.Comment{ID: reviewID, ProductID: productID}, nil)
+	mockDao.EXPECT().HGet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID)).Return("", nil)
+	mockDao.EXPECT().UpdateIsPinnedByID(gomock.Any(), reviewID, true).Return(nil)
+	mockDao.EXPECT().HSet(gomock.Any(), pinnedReviewKey, strconv.Itoa(productID), reviewID).Return(assert.AnError)
+
+	err := svc.PinReview(context.Background(), reviewID)
+	assert.Error(t, err)
 }
