@@ -9,6 +9,7 @@ import (
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/grpc"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/http"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/metrics"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server/repository/dao/mongo"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
@@ -24,6 +25,7 @@ func main() {
 	repository.Init()
 	mongo.Init()
 	utils.InitJwtSecret()
+	metrics.RegisterMetrics()
 	go grpc.Init(sigCh)
 	go http.Init(sigCh)
 	// listen terminage signal
