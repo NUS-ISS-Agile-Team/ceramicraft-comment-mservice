@@ -15,99 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/comment-ms/v1/customer/create": {
-            "post": {
-                "description": "Create an review record.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Review"
-                ],
-                "summary": "Review Create",
-                "parameters": [
-                    {
-                        "description": "CreateReviewRequest",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.CreateReviewRequest"
-                        }
-                    },
-                    {
-                        "enum": [
-                            "customer",
-                            "merchant"
-                        ],
-                        "type": "string",
-                        "description": "Client identifier",
-                        "name": "client",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/data.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/types.CreateReviewRequest"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/data.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/data.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/comment-ms/v1/customer/like": {
             "post": {
                 "description": "Like a review by id",
@@ -201,7 +108,100 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment-ms/v1/customer/list/product/{product_id}": {
+        "/comment-ms/v1/customer/reviews": {
+            "post": {
+                "description": "Create an review record.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Review Create",
+                "parameters": [
+                    {
+                        "description": "CreateReviewRequest",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateReviewRequest"
+                        }
+                    },
+                    {
+                        "enum": [
+                            "customer",
+                            "merchant"
+                        ],
+                        "type": "string",
+                        "description": "Client identifier",
+                        "name": "client",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/types.CreateReviewRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/data.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/comment-ms/v1/customer/reviews/product/{product_id}": {
             "get": {
                 "description": "Get list of reviews for a product",
                 "consumes": [
@@ -292,7 +292,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment-ms/v1/customer/list/user": {
+        "/comment-ms/v1/customer/reviews/user": {
             "get": {
                 "description": "Get list of reviews created by current authenticated user",
                 "consumes": [
@@ -464,9 +464,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment-ms/v1/merchant/pin": {
-            "post": {
-                "description": "Pin a review by id",
+        "/comment-ms/v1/merchant/review/{review_id}": {
+            "delete": {
+                "description": "Delete a review by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -476,16 +476,14 @@ const docTemplate = `{
                 "tags": [
                     "Review"
                 ],
-                "summary": "Pin a review",
+                "summary": "Delete a review",
                 "parameters": [
                     {
-                        "description": "PinReviewRequest",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.PinReviewRequest"
-                        }
+                        "type": "string",
+                        "description": "Review ID",
+                        "name": "review_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -546,7 +544,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment-ms/v1/merchant/reply": {
+        "/comment-ms/v1/merchant/reviews": {
             "post": {
                 "description": "Reply an review record.",
                 "consumes": [
@@ -626,11 +624,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/comment-ms/v1/merchant/review/{review_id}": {
-            "delete": {
-                "description": "Delete a review by id",
+            },
+            "patch": {
+                "description": "Pin a review by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -640,14 +636,16 @@ const docTemplate = `{
                 "tags": [
                     "Review"
                 ],
-                "summary": "Delete a review",
+                "summary": "Pin a review",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Review ID",
-                        "name": "review_id",
-                        "in": "path",
-                        "required": true
+                        "description": "PinReviewRequest",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.PinReviewRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -806,6 +804,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "is_anonymous": {
+                    "type": "boolean"
+                },
+                "is_pinned": {
                     "type": "boolean"
                 },
                 "likes": {

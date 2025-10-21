@@ -22,7 +22,7 @@ import (
 // @Success 200	{object} data.BaseResponse{data=types.CreateReviewRequest}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/customer/create [post]
+// @Router /comment-ms/v1/customer/reviews [post]
 func CreateReview(c *gin.Context) {
 	var req types.CreateReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -75,7 +75,7 @@ func Like(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse{data=[]types.ReviewInfo}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/customer/list/user [get]
+// @Router /comment-ms/v1/customer/reviews/user [get]
 func GetListByUserID(c *gin.Context) {
 	userID := c.Value("userID").(int)
 	list, err := service.GetReviewServiceInstance().GetListByUserID(c, userID)
@@ -97,7 +97,7 @@ func GetListByUserID(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse{data=types.ListReviewResponse}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/customer/list/product/{product_id} [get]
+// @Router /comment-ms/v1/customer/reviews/product/{product_id} [get]
 func GetListByProductID(c *gin.Context) {
 	pidStr := c.Param("product_id")
 	pid, err := strconv.Atoi(pidStr)
@@ -156,7 +156,7 @@ func ListReviewsByFilter(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse{data=string}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/merchant/pin [post]
+// @Router /comment-ms/v1/merchant/reviews [patch]
 func PinReview(c *gin.Context) {
 	var req types.PinReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -207,7 +207,7 @@ func DeleteReview(c *gin.Context) {
 // @Success 200	{object} data.BaseResponse{data=types.CreateReviewRequest}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/merchant/reply [post]
+// @Router /comment-ms/v1/merchant/reviews [post]
 func ReplyReview(c *gin.Context) {
 	var req types.CreateReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
