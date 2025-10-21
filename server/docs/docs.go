@@ -544,7 +544,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment-ms/v1/merchant/reviews": {
+        "/comment-ms/v1/merchant/reviews/{review_id}": {
             "patch": {
                 "description": "Pin a review by id",
                 "consumes": [
@@ -785,8 +785,8 @@ const docTemplate = `{
         "types.PinReviewRequest": {
             "type": "object",
             "properties": {
-                "review_id": {
-                    "type": "string"
+                "is_pinned": {
+                    "type": "boolean"
                 }
             }
         },
