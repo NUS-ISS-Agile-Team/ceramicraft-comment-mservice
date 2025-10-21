@@ -36,7 +36,7 @@ func NewRouter() *gin.Engine {
 		merchantGroup.PATCH("/reviews/:review_id", api.PinReview)
 		merchantGroup.DELETE("/review/:review_id", api.DeleteReview)
 		merchantGroup.POST("/list", api.ListReviewsByFilter)
-		merchantGroup.POST("/reviews/:review_id/reply", api.ReplyReview)
+		merchantGroup.POST("/reviews/:review_id/replies", api.ReplyReview)
 	}
 
 	customerGroup := basicGroup.Group("/customer")
