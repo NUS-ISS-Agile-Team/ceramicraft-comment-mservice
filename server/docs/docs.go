@@ -545,8 +545,8 @@ const docTemplate = `{
             }
         },
         "/comment-ms/v1/merchant/reviews": {
-            "post": {
-                "description": "Reply an review record.",
+            "patch": {
+                "description": "Pin a review by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -556,15 +556,15 @@ const docTemplate = `{
                 "tags": [
                     "Review"
                 ],
-                "summary": "Review Reply",
+                "summary": "Pin a review",
                 "parameters": [
                     {
-                        "description": "CreateReviewRequest",
+                        "description": "PinReviewRequest",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.CreateReviewRequest"
+                            "$ref": "#/definitions/types.PinReviewRequest"
                         }
                     }
                 ],
@@ -580,7 +580,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/types.CreateReviewRequest"
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -624,9 +624,11 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "patch": {
-                "description": "Pin a review by id",
+            }
+        },
+        "/comment-ms/v1/merchant/reviews/{review_id}/reply": {
+            "post": {
+                "description": "Reply an review record.",
                 "consumes": [
                     "application/json"
                 ],
@@ -636,15 +638,15 @@ const docTemplate = `{
                 "tags": [
                     "Review"
                 ],
-                "summary": "Pin a review",
+                "summary": "Review Reply",
                 "parameters": [
                     {
-                        "description": "PinReviewRequest",
+                        "description": "CreateReviewRequest",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.PinReviewRequest"
+                            "$ref": "#/definitions/types.CreateReviewRequest"
                         }
                     }
                 ],
@@ -660,7 +662,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "string"
+                                            "$ref": "#/definitions/types.CreateReviewRequest"
                                         }
                                     }
                                 }

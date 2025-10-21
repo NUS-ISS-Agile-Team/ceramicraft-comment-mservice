@@ -427,6 +427,7 @@ paths:
       summary: Pin a review
       tags:
       - Review
+  /comment-ms/v1/merchant/reviews/{review_id}/reply:
     post:
       consumes:
       - application/json

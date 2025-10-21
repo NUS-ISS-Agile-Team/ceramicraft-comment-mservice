@@ -156,19 +156,29 @@ func ListReviewsByFilter(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse{data=string}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/merchant/reviews [patch]
+// @Router /comment-ms/v1/merchant/reviews/{review_id} [patch]
 func PinReview(c *gin.Context) {
+	reviewID := c.Param("review_id")
+	if reviewID == "" {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: "empty review_id"})
+		return
+	}
 	var req types.PinReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: err.Error()})
 		return
 	}
-	err := service.GetReviewServiceInstance().PinReview(c, req.ReviewID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
+	if req.IsPinned {
+		err := service.GetReviewServiceInstance().PinReview(c, reviewID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, data.BaseResponse{ErrMsg: err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, RespSuccess(c, "pin success"))
 		return
 	}
-	c.JSON(http.StatusOK, RespSuccess(c, "pin success"))
+
+	c.JSON(http.StatusOK, RespSuccess(c, nil))
 }
 
 // Delete review
@@ -207,13 +217,19 @@ func DeleteReview(c *gin.Context) {
 // @Success 200	{object} data.BaseResponse{data=types.CreateReviewRequest}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/merchant/reviews [post]
+// @Router /comment-ms/v1/merchant/reviews/{review_id}/reply [post]
 func ReplyReview(c *gin.Context) {
+	parentID := c.Param("review_id")
+	if parentID == "" {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: "empty review_id"})
+		return
+	}
 	var req types.CreateReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: err.Error()})
 		return
 	}
+	req.ParentID = parentID
 	userID := c.Value("userID").(int)
 	err := service.GetReviewServiceInstance().CreateReview(c, req, userID)
 	if err != nil {
