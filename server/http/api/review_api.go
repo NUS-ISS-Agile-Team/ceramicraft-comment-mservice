@@ -49,13 +49,19 @@ func CreateReview(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse{data=string}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/customer/like [post]
+// @Router /comment-ms/v1/customer/reviews/{review_id}/like [post]
 func Like(c *gin.Context) {
+	reviewID := c.Param("review_id")
+	if reviewID == "" {
+		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: "empty review_id"})
+		return
+	}
 	var req types.LikeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, data.BaseResponse{ErrMsg: err.Error()})
 		return
 	}
+	req.ReviewID = reviewID
 	userID := c.Value("userID").(int)
 	err := service.GetReviewServiceInstance().Like(c, req, userID)
 	if err != nil {
@@ -127,7 +133,7 @@ func GetListByProductID(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse{data=[]types.ReviewInfo}
 // @Failure 400 {object} data.BaseResponse{data=string}
 // @Failure 500 {object} data.BaseResponse{data=string}
-// @Router /comment-ms/v1/merchant/list [post]
+// @Router /comment-ms/v1/merchant/reviews/list [post]
 func ListReviewsByFilter(c *gin.Context) {
 	var req types.ListReviewRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

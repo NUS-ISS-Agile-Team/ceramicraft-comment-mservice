@@ -83,59 +83,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /comment-ms/v1/customer/like:
-    post:
-      consumes:
-      - application/json
-      description: Like a review by id
-      parameters:
-      - description: LikeRequest
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/types.LikeRequest'
-      - description: Client identifier
-        enum:
-        - customer
-        - merchant
-        in: path
-        name: client
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Like a review
-      tags:
-      - Review
   /comment-ms/v1/customer/reviews:
     post:
       consumes:
@@ -187,6 +134,59 @@ paths:
                   type: string
               type: object
       summary: Review Create
+      tags:
+      - Review
+  /comment-ms/v1/customer/reviews/{review_id}/like:
+    post:
+      consumes:
+      - application/json
+      description: Like a review by id
+      parameters:
+      - description: LikeRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.LikeRequest'
+      - description: Client identifier
+        enum:
+        - customer
+        - merchant
+        in: path
+        name: client
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Like a review
       tags:
       - Review
   /comment-ms/v1/customer/reviews/product/{product_id}:
@@ -288,54 +288,6 @@ paths:
                   type: string
               type: object
       summary: Get reviews by user
-      tags:
-      - Review
-  /comment-ms/v1/merchant/list:
-    post:
-      consumes:
-      - application/json
-      description: Filter reviews by product_id and stars (0 means any), ordered by
-        created_at desc
-      parameters:
-      - description: ListReviewRequest
-        in: body
-        name: filter
-        required: true
-        schema:
-          $ref: '#/definitions/types.ListReviewRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/types.ReviewInfo'
-                  type: array
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: List reviews by product and stars
       tags:
       - Review
   /comment-ms/v1/merchant/review/{review_id}:
@@ -470,6 +422,54 @@ paths:
                   type: string
               type: object
       summary: Review Reply
+      tags:
+      - Review
+  /comment-ms/v1/merchant/reviews/list:
+    post:
+      consumes:
+      - application/json
+      description: Filter reviews by product_id and stars (0 means any), ordered by
+        created_at desc
+      parameters:
+      - description: ListReviewRequest
+        in: body
+        name: filter
+        required: true
+        schema:
+          $ref: '#/definitions/types.ListReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/types.ReviewInfo'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: List reviews by product and stars
       tags:
       - Review
 swagger: "2.0"

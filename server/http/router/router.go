@@ -35,7 +35,7 @@ func NewRouter() *gin.Engine {
 		merchantGroup.Use(middleware.AuthMiddleware())
 		merchantGroup.PATCH("/reviews/:review_id", api.PinReview)
 		merchantGroup.DELETE("/review/:review_id", api.DeleteReview)
-		merchantGroup.POST("/list", api.ListReviewsByFilter)
+		merchantGroup.POST("/reviews/list", api.ListReviewsByFilter)
 		merchantGroup.POST("/reviews/:review_id/replies", api.ReplyReview)
 	}
 
@@ -43,7 +43,7 @@ func NewRouter() *gin.Engine {
 	{
 		customerGroup.Use(middleware.AuthMiddleware())
 		customerGroup.POST("/reviews", api.CreateReview)
-		customerGroup.POST("/like", api.Like)
+		customerGroup.POST("/reviews/:review_id/like", api.Like)
 		customerGroup.GET("/reviews/user", api.GetListByUserID)
 		customerGroup.GET("/reviews/product/:product_id", api.GetListByProductID)
 	}
