@@ -31,7 +31,7 @@ type ReviewInfo struct {
 }
 
 type PinReviewRequest struct {
-	ReviewID string `json:"review_id"`
+	IsPinned bool   `json:"is_pinned"`
 }
 
 type ListReviewResponse struct {

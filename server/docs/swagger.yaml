@@ -48,8 +48,8 @@ definitions:
     type: object
   types.PinReviewRequest:
     properties:
-      review_id:
-        type: string
+      is_pinned:
+        type: boolean
     type: object
   types.ReviewInfo:
     properties:
@@ -62,6 +62,8 @@ definitions:
       id:
         type: string
       is_anonymous:
+        type: boolean
+      is_pinned:
         type: boolean
       likes:
         type: integer
@@ -81,7 +83,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /comment-ms/v1/customer/create:
+  /comment-ms/v1/customer/reviews:
     post:
       consumes:
       - application/json
@@ -134,7 +136,7 @@ paths:
       summary: Review Create
       tags:
       - Review
-  /comment-ms/v1/customer/like:
+  /comment-ms/v1/customer/reviews/{review_id}/like:
     post:
       consumes:
       - application/json
@@ -187,7 +189,7 @@ paths:
       summary: Like a review
       tags:
       - Review
-  /comment-ms/v1/customer/list/product/{product_id}:
+  /comment-ms/v1/customer/reviews/product/{product_id}:
     get:
       consumes:
       - application/json
@@ -239,7 +241,7 @@ paths:
       summary: Get reviews by product
       tags:
       - Review
-  /comment-ms/v1/customer/list/user:
+  /comment-ms/v1/customer/reviews/user:
     get:
       consumes:
       - application/json
@@ -288,7 +290,141 @@ paths:
       summary: Get reviews by user
       tags:
       - Review
-  /comment-ms/v1/merchant/list:
+  /comment-ms/v1/merchant/review/{review_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a review by id
+      parameters:
+      - description: Review ID
+        in: path
+        name: review_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete a review
+      tags:
+      - Review
+  /comment-ms/v1/merchant/reviews/{review_id}:
+    patch:
+      consumes:
+      - application/json
+      description: Pin a review by id
+      parameters:
+      - description: PinReviewRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.PinReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Pin a review
+      tags:
+      - Review
+  /comment-ms/v1/merchant/reviews/{review_id}/reply:
+    post:
+      consumes:
+      - application/json
+      description: Reply an review record.
+      parameters:
+      - description: CreateReviewRequest
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/types.CreateReviewRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Review Reply
+      tags:
+      - Review
+  /comment-ms/v1/merchant/reviews/list:
     post:
       consumes:
       - application/json
@@ -334,140 +470,6 @@ paths:
                   type: string
               type: object
       summary: List reviews by product and stars
-      tags:
-      - Review
-  /comment-ms/v1/merchant/pin:
-    post:
-      consumes:
-      - application/json
-      description: Pin a review by id
-      parameters:
-      - description: PinReviewRequest
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/types.PinReviewRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Pin a review
-      tags:
-      - Review
-  /comment-ms/v1/merchant/reply:
-    post:
-      consumes:
-      - application/json
-      description: Reply an review record.
-      parameters:
-      - description: CreateReviewRequest
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/types.CreateReviewRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/types.CreateReviewRequest'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Review Reply
-      tags:
-      - Review
-  /comment-ms/v1/merchant/review/{review_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a review by id
-      parameters:
-      - description: Review ID
-        in: path
-        name: review_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Delete a review
       tags:
       - Review
 swagger: "2.0"
