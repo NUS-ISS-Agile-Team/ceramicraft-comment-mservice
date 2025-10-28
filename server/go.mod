@@ -1,6 +1,6 @@
 module github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/server
 
-go 1.24.0
+go 1.24.6
 
 require (
 	github.com/NUS-ISS-Agile-Team/ceramicraft-comment-mservice/common v0.0.0-20251010123249-d77fc73795e5
