@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - KAN-136-Security-Backend
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
